@@ -1,0 +1,5 @@
+﻿*.log           //忽略所有log文件
+node_modules/*           //忽略tmp文件夹所有文件
+node_modules/**/*.*    //忽略log目录下的包括子目录下的所有log文件
+dist/*
+dist/**/*.*
