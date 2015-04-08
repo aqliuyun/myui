@@ -1,8 +1,13 @@
 
+/** @namespace */
 var myui = (function(libs,$){
     var libs = libs || {};
-    var Utils = libs.Utils;
-    libs.ScrollerWatcher = (function(){        
+    var Utils = libs.Utils;    
+    libs.ScrollerWatcher = (function(){   
+        /**
+        * @description 数据通过滑动条动态显示
+        * @constructor ScrollerWatcher
+        */
         function Watcher(options){
             this.id = libs.Utils.unique();
             this.scroller = new libs.DataScroller({ displaySize:options.displaySize || 1,pageSize:options.pageSize || 1,rowIndex:options.rowIndex || 0});
@@ -13,6 +18,13 @@ var myui = (function(libs,$){
         }
 
         Watcher.prototype = {
+            /**
+            * @memberof ScrollerWatcher
+            * @method attach
+            * @description 附加到数据适配器上，生成观察者视图
+            * @param adapter {object} - 数据适配器
+            * @example attach(new DefaultAdapter());
+            */
             attach:function (adapter) {
                 var that = this;
                 var ctrl = []; 
@@ -23,18 +35,15 @@ var myui = (function(libs,$){
                 ctrl.push('</div>');
                 ctrl.push('<div class="scroller-real" style="overflow-y:hidden;overflow-x:auto;"></div>')
                 ctrl.push('</div>');
-                //var $parent = adapter.container.parent();
                 var $wrap = $(ctrl.join(''));
                 this.$container = adapter.container;
                 adapter.container.empty();
                 adapter.container.append($wrap);
-                //$wrap.insertAfter(adapter.container);
-                //var $container = adapter.container.detach();
-                //$wrap.append($container);
                 adapter.container = $wrap.find('.scroller-real');
                 this.adapter = adapter;
                 this.bindEvents();
             },
+            /**@description 和数据适配器分离*/
             detach:function(){
                 this.adapter.container = this.$container;
                 this.adapter.container.empty();

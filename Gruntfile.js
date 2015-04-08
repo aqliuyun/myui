@@ -17,6 +17,17 @@ module.exports = function (grunt) {
         dest: 'dist/myui.min.css'
       }    
     },
+    jsdoc: {
+      dist:{
+        src:['js/*.js','!js/myui.libs.js'],
+        options:{
+          destination:'doc',
+          private:false,
+          template:'node_modules/grunt-jsdoc/node_modules/ink-docstrap/template',
+          configure : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template/jsdoc.conf.json",
+        }
+      }
+    },
     uglify:{
       buildall:{
         options:{
@@ -34,5 +45,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-css');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.registerTask('default', ['concat','cssmin','uglify:buildall']);
+  grunt.loadNpmTasks('grunt-jsdoc');
+  grunt.registerTask('default', ['concat','cssmin','uglify:buildall','jsdoc']);
+  grunt.registerTask('doc', ['jsdoc']);
 }  
