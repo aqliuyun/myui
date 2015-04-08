@@ -1,0 +1,51 @@
+.sel-box.radio
+{
+	-webkit-appearance:none;
+	border-radius: 50%;
+	background-color:#cbd1d8;
+	padding: 0;
+	margin: 0;        
+}
+
+.sel-box.checkbox
+{
+	-webkit-appearance:none;
+	background-color:#cbd1d8;
+	padding: 0;
+	margin: 0;
+}
+
+.sel-box.radio,
+.sel-box.checkbox
+{
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+}
+
+
+.sel-box.radio:checked,
+.sel-box.checkbox:checked
+{
+	background:#40e0d0;
+	outline: 0px;
+}
+
+.sel-box.radio:checked::after,
+.sel-box.checkbox:checked::after
+{
+	content:'\2714';
+}
+
+.sel-box.radio:checked::after,
+.sel-box.checkbox:checked::after
+{
+	display: inline-block;
+	color:#fff;
+	font-size: 1em;
+	font-weight: bold;
+	line-height: 20px;
+	text-align: center;
+	width: 20px;
+	height: 20px;
+}

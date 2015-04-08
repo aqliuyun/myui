@@ -1,0 +1,48 @@
+.datapager-container
+{
+	border:1px solid #ddd;
+	border-top:0;
+	padding: 5px;
+}
+
+.datapager
+{            
+	padding-left: 0;
+	width: 380px;
+	margin: 0px auto;
+}
+
+.datapager li
+{
+	display: inline;
+}        
+
+.datapager > li > a, .datapager > li > span
+{
+	position: relative;
+	padding: 6px 12px;
+	margin-left: -1px;
+	text-decoration:none;
+	line-height: 1em;
+	color:#428BCA;
+	border:1px solid #DDD;
+	display: inline-block;
+}
+
+.datapager > li > a:hover, .datapager > li > span:hover, .datapager > li > a:focus, .datapager > li > span:focus
+{
+	background:#EEE;
+}
+
+
+.datapager-cur >  a
+{
+	padding: 3px 12px!important;
+}
+
+.datapager-cur input[type=text]
+{
+	height: 20px;
+	width: 50px;
+	text-align: center;
+}
