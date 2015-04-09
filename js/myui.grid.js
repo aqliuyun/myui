@@ -1,11 +1,10 @@
-
 /** @namespace */
 var myui = (function(libs,$){
     var libs = libs || {};
-    var Utils = libs.Utils;    
-    libs.ScrollerWatcher = (function(){   
+    var Utils = libs.Utils;
+    libs.ScrollerWatcher = (function(){        
         /**
-        * @description 数据通过滑动条动态显示
+        * @description 滑动视图
         * @constructor ScrollerWatcher
         */
         function Watcher(options){
@@ -19,11 +18,12 @@ var myui = (function(libs,$){
 
         Watcher.prototype = {
             /**
-            * @memberof ScrollerWatcher
-            * @method attach
-            * @description 附加到数据适配器上，生成观察者视图
-            * @param adapter {object} - 数据适配器
-            * @example attach(new DefaultAdapter());
+            *@public
+            *@instance
+            *@memberof ScrollerWatcher
+            *@method
+            *@description 附加到数据适配器上，生成观察者视图
+            *@param adapter {object} - 数据适配器
             */
             attach:function (adapter) {
                 var that = this;
@@ -43,7 +43,13 @@ var myui = (function(libs,$){
                 this.adapter = adapter;
                 this.bindEvents();
             },
-            /**@description 和数据适配器分离*/
+            /**
+            *@public
+            *@instance
+            *@memberof ScrollerWatcher
+            *@method
+            *@description 从数据适配器上分离
+            */
             detach:function(){
                 this.adapter.container = this.$container;
                 this.adapter.container.empty();
@@ -56,10 +62,16 @@ var myui = (function(libs,$){
                     that.scroller.setCurPos(~~($(this).scrollTop() / that.rowHeight),that.scroller.displaySize,that.adapter.datas.length);                
                     that.adapter.refresh();
                 });
+                $dom.on('mousewheel',function (event) {
+                    var top = $('.scroller-container', $dom).scrollTop();
+                    $('.scroller-container', $dom).scrollTop(top + event.originalEvent.deltaY);
+                    event.preventDefault();
+                });
             },
             unBindEvents:function () {
                 var $dom = $('#watcher_'+this.id);
                 $('.scroller-container',$dom).off('scroll');
+                $dom.off('mousewheel');
             },
             watchData:function (datas) {
                 var $dom = $('#watcher_'+this.id);
@@ -76,6 +88,10 @@ var myui = (function(libs,$){
         return Watcher;
     })();
     libs.PagerWatcher = (function(){
+        /**
+        * @description 分页视图
+        * @constructor PagerWatcher
+        */
         function Watcher(options) {     
             this.id = libs.Utils.unique();
             this.datapager = new libs.DataPager({ pageIndex:options.pageIndex,pageSize:options.pageSize });
@@ -87,10 +103,22 @@ var myui = (function(libs,$){
 
         Watcher.prototype = {
             events:{
+                /**
+                *@description 页序号发生改变后触发
+                *@event PagerWatcher#onPageChanged
+                */
                 onPageChanged:function(){
                     this.adapter && this.adapter.refresh();
                 }
             },
+            /**
+            *@public
+            *@instance
+            *@memberof PagerWatcher
+            *@method
+            *@description 附加到数据适配器上，生成观察者视图
+            *@param adapter {object} - 数据适配器
+            */
             attach:function(adapter){
                 this.adapter = adapter;
                 var that = this;
@@ -115,6 +143,13 @@ var myui = (function(libs,$){
                 this.adapter = adapter;   
                 this.bindEvents();
             },
+            /**
+            *@public
+            *@instance
+            *@memberof PagerWatcher
+            *@method
+            *@description 从数据适配器上分离
+            */
             detach:function(){
                 this.adapter.container = this.$container;
                 this.adapter.container.empty();
@@ -349,6 +384,10 @@ var myui = (function(libs,$){
                 }
                 return result;
             },
+            selectKey: function (key) {
+                this.select = key;
+                this.events.onSelectRow && this.events.onSelectRow.apply(this, [key]);
+            },
             //绑定view事件
             bindEvents: function(){
                 this.events.onBindEvents && this.events.onBindEvents.apply(this);
@@ -371,106 +410,87 @@ var myui = (function(libs,$){
                         that.events.onSortChanged && that.events.onSortChanged.apply(that);
                     });
 
-                    $('.sel-box',$dom).click(function(event){
+                    $('.sel-box', $dom).click(function (event) {
                         event.stopPropagation();
                         var $selbox = $(this);
                         var modelKey = $selbox.parents('tr').attr('data-modelKey');
                         var check = $selbox.prop('checked');
-                        if(that.options.selectmode == 'single')
-                        {
-                            $('.sel-box',$dom).not($selbox).prop('checked',false);
-                            if($selbox.attr('type') == 'checkbox')
-                            {
-                                if(check)
-                                {
-                                    that.select = modelKey;
+                        if (that.options.selectmode == 'single') {
+                            $('.sel-box', $dom).not($selbox).prop('checked', false);
+                            if ($selbox.attr('type') == 'checkbox') {
+                                if (check) {
+                                    that.selectKey(modelKey);
                                 }
-                                else
-                                {
-                                    that.select = null;
+                                else {
+                                    that.selectKey(null);
                                 }
                             }
-                            else
-                            {
-                                that.select = modelKey;
-                            }                    
+                            else {
+                                that.selectKey(modelKey);
+                            }
                         }
-                        else if(that.options.selectmode == 'multiple')
-                        {
-                            if(check)
-                            {
+                        else if (that.options.selectmode == 'multiple') {
+                            if (check) {
                                 that.selects.push(modelKey);
                             }
-                            else
-                            {
-                                libs.Utils.arrayRemove(that.selects,modelKey);                                    
-                            }                        
-                            that.select = modelKey;
-                        }                    
-                        else
-                        {
-                            that.select = null;
+                            else {
+                                libs.Utils.arrayRemove(that.selects, modelKey);
+                            }
+                            that.selectKey(modelKey);
+                        }
+                        else {
+                            that.selectKey(null);
                             that.selects = [];
-                            $selbox.prop('checked',false);
+                            $selbox.prop('checked', false);
                             return false;
                         }
                         return true;
                     })
 
-                    $('tbody tr',$dom).click(function(){
+                    $('tbody tr', $dom).click(function () {
                         var modelKey = $(this).attr('data-modelKey');
                         var $selbox = $(this).find('.sel-box');
                         var check = $selbox.prop('checked');
-                        if(that.options.selectmode == 'single')
-                        {
-                            $('.sel-box',$dom).not($selbox).prop('checked',false);
-                            if($selbox.attr('type') == 'checkbox')
-                            {
-                                if(check)
-                                {
-                                    that.select = null;
+                        if (that.options.selectmode == 'single') {
+                            $('.sel-box', $dom).not($selbox).prop('checked', false);
+                            if ($selbox.attr('type') == 'checkbox') {
+                                if (check) {
+                                    that.selectKey(null);
                                     $selbox.parents('tr').removeClass('highlight');
                                 }
-                                else
-                                {
-                                    that.select = modelKey;
-                                    $('tbody tr',$dom).not($selbox.parents('tr')).removeClass('highlight');
+                                else {
+                                    that.selectKey(modelKey);
+                                    $('tbody tr', $dom).not($selbox.parents('tr')).removeClass('highlight');
                                     $selbox.parents('tr').addClass('highlight');
                                 }
-                                $selbox.prop('checked',!check);
+                                $selbox.prop('checked', !check);
                             }
-                            else
-                            {
-                                that.select = modelKey;
+                            else {
+                                that.selectKey(modelKey);
                                 $selbox.parents('tr').addClass('highlight');
-                                $selbox.prop('checked',true);
+                                $selbox.prop('checked', true);
                             }
                         }
-                        else if(that.options.selectmode == 'multiple')
-                        {
-                            if(check)
-                            {
-                                libs.Utils.arrayRemove(that.selects,modelKey);
+                        else if (that.options.selectmode == 'multiple') {
+                            if (check) {
+                                libs.Utils.arrayRemove(that.selects, modelKey);
                                 $selbox.parents('tr').removeClass('highlight');
-                                that.select = null;
+                                that.selectKey(null);
                             }
-                            else
-                            {
-                                that.selects.push(modelKey);                   
-                                $selbox.parents('tr').addClass('highlight');         
-                                that.select = modelKey;
-                            }                                                    
-                            $selbox.prop('checked',!check);
-                        }                    
-                        else
-                        {
-                            that.select = null;
+                            else {
+                                that.selects.push(modelKey);
+                                $selbox.parents('tr').addClass('highlight');
+                                that.selectKey(modelKey);
+                            }
+                            $selbox.prop('checked', !check);
+                        }
+                        else {
+                            that.selectKey(null);
                             that.selects = [];
                             $selbox.parents('tr').removeClass('highlight');
-                            $selbox.prop('checked',false);
+                            $selbox.prop('checked', false);
                         }
                         var data = that.getSelectData();
-                        that.options.onselectrow && that.options.onselectrow.apply(that,[data,that.select,that.selects]);
                     });
 
                     $('th .split',$dom).mousedown(function(event) {
@@ -567,6 +587,10 @@ var myui = (function(libs,$){
         return View;
     })();
     libs.Grid = (function(){
+        /**
+        * @description 表格控件
+        * @constructor Grid
+        */
         function Grid(options)
         {
             this.id = libs.Utils.unique();
@@ -581,12 +605,40 @@ var myui = (function(libs,$){
         }
 
         Grid.prototype = {
-            resize:function (argument) {
+            events:{
+                /**
+                *@description 远程数据加载好触发
+                *@event Grid#onLoadComplete
+                */
+                onLoadComplete:null,
+                /**
+                *@description 表格渲染后触发
+                *@event Grid#onGridComplete
+                */
+                onGridComplete:null,
+                /**
+                *@description 选中行触发
+                *@event Grid#onSelectRow
+                */
+                onSelectRow:null
+            },
+            /**
+            *@private
+            *@description 重新调整表格大小
+            */
+            resize:function () {
                 var that = this;
                 $(window).resize(function () {
                     that.adapter.refresh();
                 });
             },
+            /**
+            *@public
+            *@instance
+            *@memberof Grid
+            *@method
+            *@description 附加到数据管理源
+            */
             attach:function(manager){
                 var that = this;
                 this.manager = manager;
@@ -618,26 +670,33 @@ var myui = (function(libs,$){
                 {
                     if(options.pagedata)
                     {
-                        var datas = that.events.loadComplete && that.events.loadComplete.apply(that,[options.datas]) || options.datas;
+                        var datas = that.events.onLoadComplete && that.events.onLoadComplete.apply(that,[options.datas]) || options.datas;
                         that.manager.begin();
                         that.watcher.datapager.setCurPage(options.pageIndex,options.pageSize,datas.length);
                         that.manager.clear();
                         that.manager.appendDatas(datas);
                         that.manager.end();
-                        that.events.gridComplete && that.events.gridComplete.apply(that);
+                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
                     }
                     else
                     {
-                        var datas = that.events.loadComplete && that.events.loadComplete.apply(that,[options.datas]) || options.datas;
+                        var datas = that.events.onLoadComplete && that.events.onLoadComplete.apply(that,[options.datas]) || options.datas;
                         that.manager.begin();
                         that.watcher.scroller.setCurPos(null,null,datas.length);
                         that.manager.clear();
                         that.manager.appendDatas(datas);
                         that.manager.end();
-                        that.events.gridComplete && that.events.gridComplete.apply(that);
+                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
                     }
                 }                
             },
+            /**
+            *@public
+            *@instance
+            *@memberof Grid
+            *@method
+            *@description 数据来源是远程就重新加载，是本地则重新刷新
+            */
             reload:function(){
                 var options = this.options;
                 if(options.url)
@@ -665,6 +724,12 @@ var myui = (function(libs,$){
                     this.adapter.refresh();
                 }
             },
+            /**
+            *@private
+            *@instance
+            *@memberof Grid
+            *@method
+            */
             loadPageData:function(){
                 var that = this;
                 var options = this.options;
@@ -678,16 +743,22 @@ var myui = (function(libs,$){
                     data:params,
                     dataType:options.dataType,
                     success:function(result){
-                        result = that.events.loadComplete && that.events.loadComplete.apply(that,[result]) || result;
+                        result = that.events.onLoadComplete && that.events.onLoadComplete.apply(that,[result]) || result;
                         if(!result){ result = { pageIndex:1,pageSize:that.watcher.datapager.pageSize,totalSize:0 }; }
                         that.manager.begin();
                         that.watcher.datapager.setCurPage(result.pageIndex,result.pageSize,result.totalSize);
                         that.manager.clear();
                         that.manager.appendDatas(result.datas);
                         that.manager.end();
-                        that.events.gridComplete && that.events.gridComplete.apply(that);
+                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
                     }}); 
             },
+            /**
+            *@private
+            *@instance
+            *@memberof Grid
+            *@method
+            */
             loadScrollData:function(){
                 var that = this;
                 var options = this.options;
@@ -699,18 +770,38 @@ var myui = (function(libs,$){
                     data:params,
                     dataType:options.dataType,
                     success:function(result){
-                        result = that.events.loadComplete && that.events.loadComplete.apply(this,[result]) || result;                                
+                        result = that.events.onLoadComplete && that.events.onLoadComplete.apply(this,[result]) || result;                                
                         if(!result){ result = []; }
                         that.manager.begin();
                         that.watcher.scroller.setCurPos(null,null,result.length);
                         that.manager.clear();
                         that.manager.appendDatas(result);
                         that.manager.end();
-                        that.events.gridComplete && that.events.gridComplete.apply(that);
+                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
                     }});
+            },
+            /**
+            *@public
+            *@instance
+            *@memberof Grid
+            *@method
+            *@description 获取选中的单条数据
+            */
+            getSelectData:function(){
+                return this.view.getSelectData();
+            },
+            /**
+            *@public
+            *@instance
+            *@memberof Grid
+            *@method
+            *@description 获取选中的多条数据
+            */
+            getSelectDatas:function(){
+                return this.view.getSelectDatas();
             }
         }
         return Grid;
     })();
     return libs;
-})(my,jQuery);
+})(myui,jQuery);

@@ -1,22 +1,29 @@
-﻿(function (lib,$) {
+﻿(function (libs,$) {
     layerState = {
         normal: 0,
         block: 1,
         unblock: 2,
         close: 3
     };
-    function mylayer(options, parent) {
-        this.id = 0;
-        this.parent = parent;
+    var zIndex = 2000;
+    function getzIndex()
+    {
+        zIndex += 2;
+        return zIndex;
+    }
+    /**
+    * @description 遮罩层
+    * @constructor Layer
+    */
+    function Layer(options) {
+        this.id = libs.Utils.unique();
         this.options = options;
+        this.parent = options.parent || document.body;
         this.state = layerState.normal;
-        this._init();
+        this.options.zIndex = getzIndex();
+        
     };
-    mylayer.default_options = {
-        share: {
-            zIndex: 2000,
-            id: 0
-        },
+    Layer.default_options = {
         zIndex: 2000,
         single: false,
         fixed: true,
@@ -26,7 +33,11 @@
         layerCss: '',
         contentCss: ''
     }
-    mylayer.manager = {
+    /**
+    *@description 全局遮罩层管理器
+    *@memberof Layer
+    */
+    Layer.manager = {
         _layers: [],
         _roots: [],
         _leafs: [],
@@ -124,36 +135,45 @@
         },
         events: {
             oncreate: function (layer) {
-                if (!layer || mylayer.manager.find(layer)) {
+                if (!layer || Layer.manager.find(layer)) {
                     return;
                 }
-                mylayer.manager._add(layer);
+                Layer.manager._add(layer);
             },
             ondestroy: function (layer) {
-                mylayer.manager._remove(layer);
+                Layer.manager._remove(layer);
             }
         }
     }
-    mylayer.prototype = {
+    Layer.prototype = {
+        /**
+        *@public
+        *@instance
+        *@memberof Layer
+        *@method
+        *@description 获取遮罩层jquery对象
+        *@return {object} 遮罩层jquery对象
+        */
         layer: function () {
-            return $(libs.Utils.strFormat("#mylayer_{0}",this.id));
+            return $(libs.Utils.strFormat("#Layer_{0}",this.id));
         },
+        /**
+        *@public
+        *@instance
+        *@memberof Layer
+        *@method
+        *@description 获取遮罩层内容Jquery对象
+        *@return {object} 遮罩层内容Jquery对象
+        */
         content: function () {
-            return $(libs.Utils.strFormat("#mylayer_content_{0}",this.id));
-        },
-        _init: function () {
-            var opts = this.options;
-            opts.share.zIndex += 2;
-            opts.share.id++;
-            this.id = opts.share.id;
-            opts.zIndex = opts.share.zIndex;
+            return $(libs.Utils.strFormat("#Layer_content_{0}",this.id));
         },
         _build: function () {
             var opts = this.options;
             var content = [];
-            var parent = this.parent;
-            content.push(libs.Utils.strFormat('<div id="mylayer_{0}" class="layer ',this.id));
-            if (parent && parent[0] == document.body) {
+            var $parent = $(this.parent);
+            content.push(libs.Utils.strFormat('<div id="Layer_{0}" class="layer ',this.id));
+            if ($parent && $parent.fisrt == document.body) {
                 content.push('root-layer');
             }
             else {
@@ -166,7 +186,7 @@
             }
             content.push(libs.Utils.strFormat(';z-index:{0};">',opts.zIndex));
             content.push('</div>');
-            content.push(libs.Utils.strFormat('<div id="mylayer_content_{0}" class="layer-content ',this.id));
+            content.push(libs.Utils.strFormat('<div id="Layer_content_{0}" class="layer-content ',this.id));
             if (opts.fixed) {
                 content.push('layer-content-fixed');
             }
@@ -205,6 +225,13 @@
             this.content().hide();
             return this;
         },
+        /**
+        *@public
+        *@instance
+        *@memberof Layer
+        *@method
+        *@description 弹出遮罩层
+        */
         block: function () {
             if (this.state == layerState.unblock) {
                 this.state = layerState.block;
@@ -214,14 +241,14 @@
             if (this.state == layerState.block) {
                 return this;
             }
-            var parent = this.parent;
-            if (parent[0] != document.body) {
-                var position = parent.css('position');
+            var $parent = $(this.parent);
+            if ($parent.get(0) != document.body) {
+                var position = $parent.css('position');
                 if (position != 'absolute' && position != 'relative') {
-                    parent.css('position', 'relative');
+                    $parent.css('position', 'relative');
                 }
             }
-            parent.append(this._build());
+            $parent.append(this._build());
             var opts = this.options;
             if (opts.target === 'self') {
                 this.content().append($(opts.dom).detach());
@@ -233,25 +260,40 @@
                     this._fixed();
             }
             this.state = layerState.block;
+            Layer.manager.events.oncreate(this);
             return this;
         },
+        /**
+        *@public
+        *@instance
+        *@memberof Layer
+        *@method
+        *@description 收起遮罩层
+        */
         unblock: function () {
             this.state = layerState.unblock;
             this.hide();
             return this;
         },
+        /**
+        *@public
+        *@instance
+        *@memberof Layer
+        *@method
+        *@description 关闭遮罩层
+        */
         close: function () {
             if (this.state = layerState.block) {
                 this.unblock();
             }
             this.state = layerState.close;
-            $(libs.Utils.strFormat('#mylayer_{0}',this.id)).remove();
-            $(libs.Utils.strFormat('#mylayer_content_{0}',this.id)).remove();
-            var parent = this.parent;
-            if (parent) {
-                parent.data('mylayer', null);
+            $(libs.Utils.strFormat('#Layer_{0}',this.id)).remove();
+            $(libs.Utils.strFormat('#Layer_content_{0}',this.id)).remove();
+            var $parent = $(this.parent);
+            if ($parent.length > 0) {
+                $parent.data('Layer', null);
             }
-            mylayer.manager.events.ondestroy(this);
+            Layer.manager.events.ondestroy(this);
             return this;
         },
         attr: function (value) {
@@ -275,6 +317,6 @@
             opts = $.extend(this.options, opts);
             this.content().html(this._build());
         }
-    }    
-    libs.mylayer = mylayer;
+    }
+    libs.Layer = Layer;
 })(myui,jQuery);

@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title></title>
+    <script src="http://libs.baidu.com/jquery/1.8.2/jquery.min.js"></script>
+    <script src="http://libs.baidu.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link href="http://libs.baidu.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="dist/myui.css">
+    <script src="dist/myui.js" type="text/javascript"></script>
+	<style type="text/css" media="screen">
+        body{
+            padding: 20px;
+        }
+
+		.ui-content-1,.ui-content-2
+		{
+            height: 300px;
+            margin-bottom: 20px;
+		}
+    </style>
+    <style type="text/css" media="screen">
+        .table-demo thead
+        {
+            background-color: #F1F5FA;
+        }
+
+        .table-demo.table-hover tr:hover>td
+        {
+            background-color:#f0f4fa!important;
+        }
+
+        .table-demo tr.highlight>td,
+        .table-demo.table-hover tr.highlight:hover>td
+        {
+            background-color: #92A8BF!important;
+        }
+    </style>    
+</head>
+<body class="myui" onselectstart="return false;">
+   <div class="ui-content-1">ui-content-1</div>
+   <div class="ui-content-2">ui-content-2</div>
+	<script type="text/javascript">
+    var count = 10000;
+    var datas = [];
+    for (var i = 0; i < count; i++) {
+        datas.push({key:i,value:myui.Utils.randInt(count),tag:'name'+i});
+    };
+
+    var g1 = new myui.Grid({
+        datas:datas,
+        pagedata:true,
+        container:$('.ui-content-1'),
+        modelName:'data', 
+        modelKey : 'key',
+        displaySize:7,
+        pageSize:5,
+		pageIndex:1,
+        rowHeight:38,
+        footText:'共{0}条数据',
+        rowid:true,
+        rowidwidth:'50px',
+        selectmode:'single',
+        sortmode:'single',
+        showfooter:false,   
+        tableCss:' table-hover table-bordered table-demo',
+        columns:[
+            { 
+                headText:'',name:'',width:'30px',
+                format:function(value,data,view) {
+                    return ['<input class="sel-box radio" type="checkbox" name="radio_',view.id,view.adapter.modelName,'" data-modelKey="',data[view.adapter.modelKey],'" ',(view.select == data[view.adapter.modelKey] ? 'checked="checked"':''),'/>'].join('');
+                }
+            },
+            { headText:'key',name:'key',resizable:true,sortable:true,sorttype:'number',sortlevel:3,sortenable:true,width:'20%'},
+            { headText:'value',name:'value',resizable:true,width:'80%',sortable:true,sortlevel:1,sortenable:false,},
+            { headText:'tag',name:'tag',resizable:true,width:'200px'},
+        ]
+    });
+
+    var g2 = new myui.Grid({
+        datas:datas,
+        pagedata:false,
+        container:$('.ui-content-2'),
+        modelName:'data', 
+        modelKey : 'key',
+        displaySize:7,
+        pageSize:5,
+        pageIndex:1,
+        rowHeight:38,
+        footText:'共{0}条数据',
+        rowid:true,
+        rowidwidth:'50px',
+        selectmode:'single',
+        sortmode:'single',
+        showfooter:false,   
+        tableCss:' table-hover table-bordered table-demo',
+        columns:[
+            { 
+                headText:'',name:'',width:'30px',
+                format:function(value,data,view) {
+                    return ['<input class="sel-box radio" type="checkbox" name="radio_',view.id,view.adapter.modelName,'" data-modelKey="',data[view.adapter.modelKey],'" ',(view.select == data[view.adapter.modelKey] ? 'checked="checked"':''),'/>'].join('');
+                }
+            },
+            { headText:'key',name:'key',resizable:true,sortable:true,sorttype:'number',sortlevel:3,sortenable:true,width:'20%'},
+            { headText:'value',name:'value',resizable:true,width:'80%',sortable:true,sortlevel:1,sortenable:false,},
+            { headText:'tag',name:'tag',resizable:true,width:'200px'},
+        ]
+    });
+
+	</script>
+</body>
+</html>

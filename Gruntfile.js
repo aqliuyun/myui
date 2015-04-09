@@ -3,7 +3,7 @@ module.exports = function (grunt) {
   {
     concat: {//文件合并  
       css: {
-        src: ['css/*.css'],
+        src: ['css/*.css','!css/myui.checkbox.css'],
         dest: 'dist/myui.css'
       },
       js:{
@@ -24,7 +24,7 @@ module.exports = function (grunt) {
           destination:'doc',
           private:false,
           template:'node_modules/grunt-jsdoc/node_modules/ink-docstrap/template',
-          configure : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template/jsdoc.conf.json",
+          configure : "jsdoc.conf.json",
         }
       }
     },
@@ -46,6 +46,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-jsdoc');
-  grunt.registerTask('default', ['concat','cssmin','uglify:buildall','jsdoc']);
+  grunt.registerTask('default', ['concat','cssmin','uglify:buildall']);
   grunt.registerTask('doc', ['jsdoc']);
 }  
