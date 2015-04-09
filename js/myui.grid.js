@@ -696,9 +696,11 @@ var myui = (function(libs,$){
             *@memberof Grid
             *@method
             *@description 数据来源是远程就重新加载，是本地则重新刷新
+            *@param {json} params 如果是远程数据来源，则向远程发起请求时附加的请求参数，如果是本地数据来源，可为null
             */
-            reload:function(){
+            reload:function(params){
                 var options = this.options;
+                options.data = params || options.data;
                 if(options.url)
                 {
                     if(options.pagedata)
