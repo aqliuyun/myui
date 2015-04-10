@@ -19,7 +19,9 @@ var myui = (function(){
             }
             return str;
         };
-
+        Utils.trigger = function(event,params){
+            return this.events[event] && this.events.apply(this,params);
+        };
         Utils.extendClass = function (subClass, superClass) {
             var F = function() {};
 
@@ -35,6 +37,20 @@ var myui = (function(){
                 superClass.prototype.constructor = superClass;
             }
         };
+        Utils.extend = function(obj){
+            var length = arguments.length;
+            if (length < 2 || obj == null) return obj;
+            for (var index = 1; index < length; index++) {
+                var source = arguments[index],
+                keys = Object.keys(source || {});
+                var l = keys.length;
+                for (var i = 0; i < l; i++) {
+                  var key = keys[i];
+                  obj[key] = source[key];
+                }
+            }
+            return obj;
+        }
         Utils.randIntRange = function (begin,end){
             return Math.ceil(Math.random() * (end - begin)) + begin;
         };
@@ -509,10 +525,10 @@ var myui = (function(){
             },
             //绑定view事件
             bindEvents: function() {
-                this.events.onBindEvents && this.events.onBindEvents();
+                this.events.onbindevents && this.events.onbindevents();
             },
             events: {
-                onBindEvents: null
+                onbindevents: null
             }
         };
 
@@ -578,10 +594,10 @@ var myui = (function(){
             },
             //事件
             events: {
-                onBindMenu: null,
-                onUnBindMenu: null,
-                onRefreshed: null,
-                onDefaultSort: null
+                onbindmenu: null,
+                onunbindmenu: null,
+                onrefreshed: null,
+                ondefaultsort: null
             },
             //设置渲染方式
             setView: function(view) {                
@@ -595,7 +611,7 @@ var myui = (function(){
                             }                        
                         }
                     }
-                    this.events.onUnBindMenu && this.events.onUnBindMenu();
+                    this.events.onunbindmenu && this.events.onunbindmenu();
                     this.view = view;
                     this.view.initialize(this);
                     this.container.addClass(this.view.viewname);
@@ -606,7 +622,7 @@ var myui = (function(){
                     }
                     this.sort();
                     this.refresh();
-                    this.events.onBindMenu && this.events.onBindMenu();
+                    this.events.onbindmenu && this.events.onbindmenu();
                 }
             },
             //添加状态
@@ -739,8 +755,8 @@ var myui = (function(){
                 sortdata.sort(function(dataA, dataB) {
                     //没有设置排序字段,默认座位号升序
                     if (count == 0) {
-                        if (that.events.onDefaultSort) {
-                            return that.events.onDefaultSort(dataA, dataB);
+                        if (that.events.ondefaultsort) {
+                            return that.events.ondefaultsort(dataA, dataB);
                         } else {
                             var propA = dataA[that.modelKey];
                             var propB = dataB[that.modelKey];
@@ -814,7 +830,7 @@ var myui = (function(){
                 }
                 views.push(this.view.renderFoot());
                 this.container.html(views.join(''));
-                this.events.onRefreshed && this.events.onRefreshed();
+                this.events.onrefreshed && this.events.onrefreshed();
                 this.view && this.view.bindEvents && this.view.bindEvents();
                 this.watcher && this.watcher.bindEvents && this.watcher.bindEvents();
             },
@@ -882,24 +898,24 @@ var myui = (function(){
             },
             //事件
             events: {
-                onBindMenu: function(){
+                onbindmenu: function(){
                     this.adapters.forEach(function (adapter) {
-                        adapter.events.onBindMenu && adapter.events.onBindMenu();
+                        adapter.events.onbindmenu && adapter.events.onbindmenu();
                     });
                 },
-                onUnBindMenu: function () {
+                onunbindmenu: function () {
                     this.adapters.forEach(function (adapter) {
-                        adapter.events.onUnBindMenu && adapter.events.onUnBindMenu();
+                        adapter.events.onunbindmenu && adapter.events.onunbindmenu();
                     });
                 },
-                onRefreshed: function () {
+                onrefreshed: function () {
                     this.adapters.forEach(function (adapter) {
-                        adapter.events.onRefreshed && adapter.events.onRefreshed();
+                        adapter.events.onrefreshed && adapter.events.onrefreshed();
                     });
                 },
-                onDefaultSort: function () {
+                ondefaultsort: function () {
                     this.adapters.forEach(function (adapter) {
-                        adapter.events.onDefaultSort && adapter.events.onDefaultSort();
+                        adapter.events.ondefaultsort && adapter.events.ondefaultsort();
                     });
                 }
             },

@@ -12,12 +12,14 @@
 	max-width: inherit;
 	margin-bottom: 0px;
 	white-space: nowrap;
+	table-layout: fixed;
 }
 
 .myui-table th
 {
 	position: relative;    
 	text-align:center;	
+	overflow: hidden;
 }
 .myui-table th.sortable{
 	cursor: pointer;

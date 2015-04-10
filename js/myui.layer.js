@@ -12,8 +12,11 @@
         return zIndex;
     }
     /**
-    * @description 遮罩层
-    * @constructor Layer
+    *@description 弹出层
+    *@constructor myui.Layer
+    *@example
+    new myui.Layer({}).block();
+    new myui.Layer({ parent : 'ui-container' }).block();
     */
     function Layer(options) {
         this.id = libs.Utils.unique();
@@ -34,13 +37,19 @@
         contentCss: ''
     }
     /**
-    *@description 全局遮罩层管理器
-    *@memberof Layer
+    *@constructs myui.LayerManager
+    *@description 全局弹出层管理类
+    *@example
+    //弹出第一个弹出层
+    myui.Layer.manager.first().block();
     */
-    Layer.manager = {
+    var LayerManager = {
         _layers: [],
         _roots: [],
         _leafs: [],
+        /**
+        *@private
+        */
         _add: function (layer) {            
             if (libs.Utils.arrayIndexOf(this._layers,layer) >= 0) { return; }
             this._layers.push(layer);
@@ -51,6 +60,9 @@
                 this._leafs.push(layer);
             }
         },
+        /**
+        *@private
+        */
         _remove: function (layer) {
             libs.Utils.arrayRemove(this._layers,layer);
             if (layer.parent === document.body) {
@@ -60,34 +72,89 @@
                 libs.Utils.arrayRemove(this._leafs,layer);
             }
         },
+        /**
+        *@public        
+        *@method
+        *@description 第一个弹出层
+        *@memberof myui.LayerManager
+        *@return {Layer} 存在返回第一个弹出层，否则返回null
+        */
         first: function () {
             return this._layers.length > 0 ? this._layers[0] : null;
         },
+        /**
+        *@public        
+        *@method
+        *@description 第一个根弹出层
+        *@memberof myui.LayerManager
+        *@return {Layer} 存在返回第一个根弹出层，否则返回null
+        */
         firstRoot: function () {
             return this._roots.length > 0 ? this._roots[0] : null;
         },
+        /**
+        *@public        
+        *@method
+        *@description 第一个叶弹出层
+        *@memberof myui.LayerManager
+        *@return {Layer} 存在返回第一个叶弹出层，否则返回null
+        */
         firstLeaf: function () {
             return this._leafs.length > 0 ? this._leafs[0] : null;
         },
+        /**
+        *@public        
+        *@method
+        *@description 最后一个弹出层
+        *@memberof myui.LayerManager
+        *@return {Layer} 存在返回最后一个弹出层，否则返回null
+        */
         last: function () {
             var layers = this._layers;
             var count = layers.length;
             return count ? layers[count - 1] : null;
         },
+         /**
+        *@public        
+        *@method
+        *@description 最后一个根弹出层
+        *@memberof myui.LayerManager
+        *@return {Layer} 存在返回最后一个根弹出层，否则返回null
+        */
         lastRoot: function () {
             var layers = this._roots;
             var count = layers.length;
             return count ? layers[count - 1] : null;
         },
+         /**
+        *@public        
+        *@method
+        *@description 最后一个叶弹出层
+        *@memberof myui.LayerManager
+        *@return {Layer} 存在返回最后一个叶弹出层，否则返回null
+        */
         lastLeaf: function () {
             var layers = this._leafs;
             var count = layers.length;
             return count ? layers[count - 1] : null;
         },
+        /**
+        *@public        
+        *@method
+        *@description 弹出层的总数
+        *@memberof myui.LayerManager
+        *@return {int} 弹出层的个数
+        */
         count: function () {
             var layers = this._layers;
             return layers.length;
         },
+        /**
+        *@public        
+        *@method
+        *@description 只打开第一个弹出层
+        *@memberof myui.LayerManager
+        */
         unique: function () {
             var layers = this._layers;
             for (var i = layers.length - 1; i > 0; i--) {
@@ -95,20 +162,39 @@
                 l.unblock();
             };
         },
-        unblockRoot: function () {
+        /**
+        *@public        
+        *@method
+        *@description 只打开第一个根弹出层
+        *@memberof myui.LayerManager
+        */
+        uniqueRoot: function () {
             var layers = this._roots;
             for (var i = layers.length - 1; i > 0; i--) {
                 var l = layers[i];
                 l.unblock();
             };
         },
-        unblockLeaf: function () {
+        /**
+        *@public        
+        *@method
+        *@description 只打开第一个叶弹出层
+        *@memberof myui.LayerManager
+        */
+        uniqueLeaf: function () {
             var layers = this._leafs;
             for (var i = layers.length - 1; i > 0; i--) {
                 var l = layers[i];
                 l.unblock();
             };
         },
+        /**
+        *@public        
+        *@method
+        *@description 判断存在弹出层
+        *@memberof myui.LayerManager
+        *@return {boolean} 存在返回true,不存在返回false
+        */
         find: function (layer) {
             var layers = this._layers;
             for (var i = layers.length - 1; i >= 0; i--) {
@@ -118,14 +204,26 @@
             };
             return false;
         },
+        /**
+        *@public        
+        *@method
+        *@description 弹出所有弹出层
+        *@memberof myui.LayerManager
+        */
         blockAll: function () {
             var layers = this._layers;
-            var count = layers.lengthl
+            var count = layers.length;
             for (var i = 0; i < count; i++) {
                 var l = layers[i];
                 l.block();
             };
         },
+        /**
+        *@public        
+        *@method
+        *@description 收起所有弹出层
+        *@memberof myui.LayerManager
+        */
         unblockAll: function () {
             var layers = this._layers;
             for (var i = layers.length - 1; i >= 0; i--) {
@@ -145,14 +243,21 @@
             }
         }
     }
+    /**
+    *@memberof myui.Layer
+    *@readonly
+    *@description 全局弹出层管理类
+    *@see myui.LayerManager
+    */
+    Layer.manager = LayerManager;
     Layer.prototype = {
         /**
         *@public
         *@instance
-        *@memberof Layer
+        *@memberof myui.Layer
         *@method
-        *@description 获取遮罩层jquery对象
-        *@return {object} 遮罩层jquery对象
+        *@description 获取弹出层jquery对象
+        *@return {object} 弹出层jquery对象
         */
         layer: function () {
             return $(libs.Utils.strFormat("#Layer_{0}",this.id));
@@ -160,10 +265,10 @@
         /**
         *@public
         *@instance
-        *@memberof Layer
+        *@memberof myui.Layer
         *@method
-        *@description 获取遮罩层内容Jquery对象
-        *@return {object} 遮罩层内容Jquery对象
+        *@description 获取弹出层内容Jquery对象
+        *@return {object} 弹出层内容Jquery对象
         */
         content: function () {
             return $(libs.Utils.strFormat("#Layer_content_{0}",this.id));
@@ -228,9 +333,9 @@
         /**
         *@public
         *@instance
-        *@memberof Layer
+        *@memberof myui.Layer
         *@method
-        *@description 弹出遮罩层
+        *@description 弹出弹出层
         */
         block: function () {
             if (this.state == layerState.unblock) {
@@ -266,9 +371,9 @@
         /**
         *@public
         *@instance
-        *@memberof Layer
+        *@memberof myui.Layer
         *@method
-        *@description 收起遮罩层
+        *@description 收起弹出层
         */
         unblock: function () {
             this.state = layerState.unblock;
@@ -278,9 +383,9 @@
         /**
         *@public
         *@instance
-        *@memberof Layer
+        *@memberof myui.Layer
         *@method
-        *@description 关闭遮罩层
+        *@description 关闭弹出层
         */
         close: function () {
             if (this.state = layerState.block) {

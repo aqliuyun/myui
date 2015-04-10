@@ -5,7 +5,7 @@ var myui = (function(libs,$){
     libs.ScrollerWatcher = (function(){        
         /**
         * @description 滑动视图
-        * @constructor ScrollerWatcher
+        * @constructor myui.ScrollerWatcher
         */
         function Watcher(options){
             this.id = libs.Utils.unique();
@@ -17,10 +17,14 @@ var myui = (function(libs,$){
         }
 
         Watcher.prototype = {
+            events:{
+                onbeforescroll:null,
+                onafterscroll:null
+            },
             /**
             *@public
             *@instance
-            *@memberof ScrollerWatcher
+            *@memberof myui.ScrollerWatcher
             *@method
             *@description 附加到数据适配器上，生成观察者视图
             *@param adapter {object} - 数据适配器
@@ -46,7 +50,7 @@ var myui = (function(libs,$){
             /**
             *@public
             *@instance
-            *@memberof ScrollerWatcher
+            *@memberof myui.ScrollerWatcher
             *@method
             *@description 从数据适配器上分离
             */
@@ -59,8 +63,10 @@ var myui = (function(libs,$){
                 var that = this;
                 var $dom = $('#watcher_'+this.id);
                 $('.scroller-container',$dom).scroll(function(){
+                    that.events.onbeforescroll && that.events.onbeforescroll.apply(that,[that.scroller]);
                     that.scroller.setCurPos(~~($(this).scrollTop() / that.rowHeight),that.scroller.displaySize,that.adapter.datas.length);                
                     that.adapter.refresh();
+                    that.events.onafterscroll && that.events.onafterscroll.apply(that,[that.scroller]);
                 });
                 $dom.on('mousewheel',function (event) {
                     var top = $('.scroller-container', $dom).scrollTop();
@@ -88,9 +94,14 @@ var myui = (function(libs,$){
         return Watcher;
     })();
     libs.PagerWatcher = (function(){
+        var default_events = {
+            onpagechanged:function(){
+                this.adapter && this.adapter.refresh();
+            }
+        }
         /**
         * @description 分页视图
-        * @constructor PagerWatcher
+        * @constructor myui.PagerWatcher
         */
         function Watcher(options) {     
             this.id = libs.Utils.unique();
@@ -99,22 +110,21 @@ var myui = (function(libs,$){
             this.options = options;
             this.$container = null;
             this.mode = options.url ? 'remote' : 'local';
+            this.events = libs.Utils.extend({},default_events,options.events);
         }
 
         Watcher.prototype = {
             events:{
                 /**
                 *@description 页序号发生改变后触发
-                *@event PagerWatcher#onPageChanged
+                *@event myui.PagerWatcher#onpagechanged
                 */
-                onPageChanged:function(){
-                    this.adapter && this.adapter.refresh();
-                }
+                onpagechanged:null
             },
             /**
             *@public
             *@instance
-            *@memberof PagerWatcher
+            *@memberof myui.PagerWatcher
             *@method
             *@description 附加到数据适配器上，生成观察者视图
             *@param adapter {object} - 数据适配器
@@ -146,7 +156,7 @@ var myui = (function(libs,$){
             /**
             *@public
             *@instance
-            *@memberof PagerWatcher
+            *@memberof myui.PagerWatcher
             *@method
             *@description 从数据适配器上分离
             */
@@ -163,7 +173,7 @@ var myui = (function(libs,$){
                     $('.datapager-cur input',$dom).val(1);
                     $('.datapager-text').html('共' + (totalPage) + '页');
                     that.datapager.setCurPage(1,that.datapager.pageSize,that.adapter.datas.length);                            
-                    that.events.onPageChanged && that.events.onPageChanged.apply(that);
+                    that.events.onpagechanged && that.events.onpagechanged.apply(that);
                 });
                 $('.datapager-prev',$dom).off('click').on('click',function(){
                     var totalPage = that.datapager.getPageTotal();
@@ -172,7 +182,7 @@ var myui = (function(libs,$){
                     $('.datapager-cur input',$dom).val(prev);
                     $('.datapager-text').html('共' + (totalPage) + '页');
                     that.datapager.setCurPage(prev,that.datapager.pageSize,that.adapter.datas.length);                
-                    that.events.onPageChanged && that.events.onPageChanged.apply(that);
+                    that.events.onpagechanged && that.events.onpagechanged.apply(that);
                 });
                 $('.datapager-cur input',$dom).off('keydown').on('keydown',function(){
                     if (event.keyCode == 13) {
@@ -182,7 +192,7 @@ var myui = (function(libs,$){
                         page = page  > totalPage ? totalPage : page;
                         $('.datapager-text').html('共' + (totalPage) + '页');
                         that.datapager.setCurPage(page,that.datapager.pageSize,that.adapter.datas.length);                
-                        that.events.onPageChanged && that.events.onPageChanged.apply(that);
+                        that.events.onpagechanged && that.events.onpagechanged.apply(that);
                     }
                 });
                 $('.datapager-next',$dom).off('click').on('click',function(){
@@ -192,14 +202,14 @@ var myui = (function(libs,$){
                     $('.datapager-cur input',$dom).val(next);
                     $('.datapager-text').html('共' + (totalPage) + '页');
                     that.datapager.setCurPage(next,that.datapager.pageSize,that.adapter.datas.length);                
-                    that.events.onPageChanged && that.events.onPageChanged.apply(that);
+                    that.events.onpagechanged && that.events.onpagechanged.apply(that);
                 });
                 $('.datapager-last',$dom).off('click').on('click',function(){
                     var totalPage = that.datapager.getPageTotal();
                     $('.datapager-cur input',$dom).val(totalPage);
                     $('.datapager-text').html('共' + (totalPage) + '页');
                     that.datapager.setCurPage(totalPage,that.datapager.pageSize,that.adapter.datas.length);                
-                    that.events.onPageChanged && that.events.onPageChanged.apply(that);
+                    that.events.onpagechanged && that.events.onpagechanged.apply(that);
                 });
             },
             unBindEvents:function () {
@@ -234,6 +244,7 @@ var myui = (function(libs,$){
         return Watcher;
     })();
     libs.DatatableView = (function(){
+        var default_events = {}
         function View(options) {
             this.id = libs.Utils.unique(); 
             this.name = options.name || 'DatatableView';
@@ -242,6 +253,7 @@ var myui = (function(libs,$){
             this.selects = [];
             this.resizeModel = {};   
             this.options = options;
+            this.events = libs.Utils.extend({},default_events,options.events);
         }    
 
         View.prototype = {
@@ -363,7 +375,8 @@ var myui = (function(libs,$){
             },
             //渲染空
             renderEmpty:function(){
-                return this.options.emptyText || '';
+                var colspan = (this.options.columns.length + (this.options.rowid ? 2 : 1)) ;
+                return ['<tr><td colspan="' + colspan + '">',this.options.emptyText || '','</td></tr>'].join('');
             },
             //刷新
             refresh: function (data,viewIndex) {
@@ -386,210 +399,249 @@ var myui = (function(libs,$){
             },
             selectKey: function (key) {
                 this.select = key;
-                this.events.onSelectRow && this.events.onSelectRow.apply(this, [key]);
+                this.events.onselecdata && this.events.onselecdata.apply(this, [key]);
             },
             //绑定view事件
             bindEvents: function(){
-                this.events.onBindEvents && this.events.onBindEvents.apply(this);
-            },
-            unBindEvents:function(){
-                this.events.onUnBindEvents && this.events.onUnBindEvents.apply(this);
-            },
-            events: {
-                onSortChanged:function(){
-                    var that = this;
-                    that.adapter.sort();
-                    that.adapter.refresh();
-                },
-                onBindEvents: function(){
-                    var that = this;
-                    var $dom = $('#'+that.name + that.id);                       
+                var that = this;
+                var $dom = $('#'+that.name + that.id);                       
 
-                    $('th',$dom).click(function(){
-                        that.adapter.toggleSortField($(this).attr('data-sortname'),that.options.sortmode == 'single');                        
-                        that.events.onSortChanged && that.events.onSortChanged.apply(that);
-                    });
+                $('th',$dom).click(function(){
+                    that.adapter.toggleSortField($(this).attr('data-sortname'),that.options.sortmode == 'single');                        
+                    that.events.onsortchanged && that.events.onsortchanged.apply(that);
+                });
 
-                    $('.sel-box', $dom).click(function (event) {
-                        event.stopPropagation();
-                        var $selbox = $(this);
-                        var modelKey = $selbox.parents('tr').attr('data-modelKey');
-                        var check = $selbox.prop('checked');
-                        if (that.options.selectmode == 'single') {
-                            $('.sel-box', $dom).not($selbox).prop('checked', false);
-                            if ($selbox.attr('type') == 'checkbox') {
-                                if (check) {
-                                    that.selectKey(modelKey);
-                                }
-                                else {
-                                    that.selectKey(null);
-                                }
-                            }
-                            else {
+                $('.sel-box', $dom).click(function (event) {
+                    event.stopPropagation();
+                    var $selbox = $(this);
+                    var modelKey = $selbox.parents('tr').attr('data-modelKey');
+                    var data = that.adapter.manager.findData(modelKey);
+                    if(that.events.onselectable && !that.events.onselectable.apply(that,[data])){
+                        $selbox.prop('checked', false);
+                        return;
+                    }
+                    var check = $selbox.prop('checked');
+                    if (that.options.selectmode == 'single') {
+                        $('.sel-box', $dom).not($selbox).prop('checked', false);
+                        if ($selbox.attr('type') == 'checkbox') {
+                            if (check) {
                                 that.selectKey(modelKey);
                             }
-                        }
-                        else if (that.options.selectmode == 'multiple') {
-                            if (check) {
-                                that.selects.push(modelKey);
-                            }
                             else {
-                                libs.Utils.arrayRemove(that.selects, modelKey);
-                            }
-                            that.selectKey(modelKey);
-                        }
-                        else {
-                            that.selectKey(null);
-                            that.selects = [];
-                            $selbox.prop('checked', false);
-                            return false;
-                        }
-                        return true;
-                    })
-
-                    $('tbody tr', $dom).click(function () {
-                        var modelKey = $(this).attr('data-modelKey');
-                        var $selbox = $(this).find('.sel-box');
-                        var check = $selbox.prop('checked');
-                        if (that.options.selectmode == 'single') {
-                            $('.sel-box', $dom).not($selbox).prop('checked', false);
-                            if ($selbox.attr('type') == 'checkbox') {
-                                if (check) {
-                                    that.selectKey(null);
-                                    $selbox.parents('tr').removeClass('highlight');
-                                }
-                                else {
-                                    that.selectKey(modelKey);
-                                    $('tbody tr', $dom).not($selbox.parents('tr')).removeClass('highlight');
-                                    $selbox.parents('tr').addClass('highlight');
-                                }
-                                $selbox.prop('checked', !check);
-                            }
-                            else {
-                                that.selectKey(modelKey);
-                                $selbox.parents('tr').addClass('highlight');
-                                $selbox.prop('checked', true);
-                            }
-                        }
-                        else if (that.options.selectmode == 'multiple') {
-                            if (check) {
-                                libs.Utils.arrayRemove(that.selects, modelKey);
-                                $selbox.parents('tr').removeClass('highlight');
                                 that.selectKey(null);
                             }
+                        }
+                        else {
+                            that.selectKey(modelKey);
+                        }
+                    }
+                    else if (that.options.selectmode == 'multiple') {
+                        if (check) {
+                            that.selects.push(modelKey);
+                        }
+                        else {
+                            libs.Utils.arrayRemove(that.selects, modelKey);
+                        }
+                        that.selectKey(modelKey);
+                    }
+                    else {
+                        that.selectKey(null);
+                        that.selects = [];
+                        $selbox.prop('checked', false);
+                        return false;
+                    }
+                    return true;
+                })
+
+                $('tbody tr', $dom).click(function () {
+                    var modelKey = $(this).attr('data-modelKey');
+                    var $selbox = $(this).find('.sel-box');
+                    var data = that.adapter.manager.findData(modelKey);
+                    if(that.events.onselectable && !that.events.onselectable.apply(that,[data])){
+                        $selbox.prop('checked', false);
+                        return;
+                    }
+                    var check = $selbox.prop('checked');
+                    if (that.options.selectmode == 'single') {
+                        $('.sel-box', $dom).not($selbox).prop('checked', false);
+                        if ($selbox.attr('type') == 'checkbox') {
+                            if (check) {
+                                that.selectKey(null);
+                                $selbox.parents('tr').removeClass('highlight');
+                            }
                             else {
-                                that.selects.push(modelKey);
-                                $selbox.parents('tr').addClass('highlight');
                                 that.selectKey(modelKey);
+                                $('tbody tr', $dom).not($selbox.parents('tr')).removeClass('highlight');
+                                $selbox.parents('tr').addClass('highlight');
                             }
                             $selbox.prop('checked', !check);
                         }
                         else {
-                            that.selectKey(null);
-                            that.selects = [];
+                            that.selectKey(modelKey);
+                            $selbox.parents('tr').addClass('highlight');
+                            $selbox.prop('checked', true);
+                        }
+                    }
+                    else if (that.options.selectmode == 'multiple') {
+                        if (check) {
+                            libs.Utils.arrayRemove(that.selects, modelKey);
                             $selbox.parents('tr').removeClass('highlight');
-                            $selbox.prop('checked', false);
+                            that.selectKey(null);
                         }
-                        var data = that.getSelectData();
-                    });
+                        else {
+                            that.selects.push(modelKey);
+                            $selbox.parents('tr').addClass('highlight');
+                            that.selectKey(modelKey);
+                        }
+                        $selbox.prop('checked', !check);
+                    }
+                    else {
+                        that.selectKey(null);
+                        that.selects = [];
+                        $selbox.parents('tr').removeClass('highlight');
+                        $selbox.prop('checked', false);
+                    }
+                    var data = that.getSelectData();
+                });
 
-                    $('th .split',$dom).mousedown(function(event) {
-                        that.resizeModel.resizeing = true;
-                        that.resizeModel.dragoffset = event.clientX;
-                        that.resizeModel.target = $(this);
-                    });                             
-                    $dom.mouseup(function(event) {
-                        if (!that.resizeModel.resizeing) { return; }
-                        $dom.siblings('.col-split').hide();
-                        that.resizeModel.resizeing = false;
-                        var $this = $(this); 
-                        var x = event.clientX - that.resizeModel.dragoffset;
-                        that.resizeModel.dragoffset = event.clientX;                    
-                        var width = that.resizeModel.target.parent().outerWidth();
-                        var containerwidth = $this.parent().outerWidth();
-                        var fixColWidth = $this.find('.fix-column').outerWidth();
-                        var tableWidth = $this.outerWidth();
-                        if(x > 0 && fixColWidth >= x)
-                        {
-                            that.resizeModel.fixColWidth = fixColWidth - x;
-                            that.resizeModel.tableWidth = containerwidth;
-                        }
-                        else if(tableWidth - fixColWidth + x >= containerwidth)
-                        {
-                            that.resizeModel.fixColWidth =  x > 0 && fixColWidth - x > 0 ? fixColWidth - x : 0;
-                            tableWidth = tableWidth + x <= containerwidth ? containerwidth : tableWidth + x;
-                            that.resizeModel.tableWidth = tableWidth;
-                            console.log(tableWidth);
-                        }
-                        else
-                        {
-                            that.resizeModel.fixColWidth = null;
-                            that.resizeModel.tableWidth = containerwidth;
-                        }
-                        var result = width + x;
-                        var splitname = that.resizeModel.target.attr('data-splitname');
-                        var column = libs.Utils.arrayFind(that.options.columns,function(left){
-                            return left.name == splitname;
-                        });
-                        
-                        column.width = result + 'px';
-                        that.adapter.refresh();
-                    })
-                    .mouseleave(function(event) {
-                        if (!that.resizeModel.resizeing) { return; }
-                        $dom.siblings('.col-split').hide();
-                        that.resizeModel.resizeing = false;                        
-                        var $this = $(this); 
-                        var x = event.clientX - that.resizeModel.dragoffset;
-                        that.resizeModel.dragoffset = event.clientX;                    
-                        var width = that.resizeModel.target.parent().outerWidth();
-                        var containerwidth = $this.parent().outerWidth();
-                        var fixColWidth = $this.find('.fix-column').outerWidth();
-                        var tableWidth = $this.outerWidth();
-                        if(tableWidth - fixColWidth + x >= containerwidth)
-                        {
-                            tableWidth = tableWidth + x <= containerwidth ? containerwidth : tableWidth + x;
-                            that.resizeModel.tableWidth = tableWidth;
-                        }
-                        else
-                        {
-                            that.resizeModel.tableWidth = containerwidth;
-                        }
-                        var result = width + x;
-                        var splitname = that.resizeModel.target.attr('data-splitname');
-                        var column = libs.Utils.arrayFind(that.options.columns,function(left){
-                            return left.name == splitname;
-                        });
-                        
-                        column.width = result + 'px';
-                        that.adapter.refresh();
-                    })
-                    .mousemove(function(event) {
-                        var $this = $(this);                        
-                        if (!that.resizeModel.resizeing) { return; }
-                        $dom.parent().css('position','relative');
-                        var $split =$dom.siblings('.col-split');
-                        $split.height($('th',$dom).outerHeight());
-                        $split.css('left',event.clientX - that.adapter.container.offset().left + $split.parent().scrollLeft()).show();
-                    });                    
-                },
-                onUnBindEvents:function(){
+                $('th .split',$dom).mousedown(function(event) {
+                    that.resizeModel.resizeing = true;
+                    that.resizeModel.dragoffset = event.clientX;
+                    that.resizeModel.target = $(this);
+                });                             
+                $dom.mouseup(function(event) {
+                    if (!that.resizeModel.resizeing) { return; }
+                    $dom.siblings('.col-split').hide();
+                    that.resizeModel.resizeing = false;
+                    var $this = $(this); 
+                    var x = event.clientX - that.resizeModel.dragoffset;
+                    that.resizeModel.dragoffset = event.clientX;                    
+                    var width = that.resizeModel.target.parent().outerWidth();
+                    var containerwidth = $this.parent().outerWidth();
+                    var fixColWidth = $this.find('.fix-column').outerWidth();
+                    var tableWidth = $this.outerWidth();
+                    if(x > 0 && fixColWidth >= x)
+                    {
+                        that.resizeModel.fixColWidth = fixColWidth - x;
+                        that.resizeModel.tableWidth = containerwidth;
+                    }
+                    else if(tableWidth - fixColWidth + x >= containerwidth)
+                    {
+                        that.resizeModel.fixColWidth =  x > 0 && fixColWidth - x > 0 ? fixColWidth - x : 0;
+                        tableWidth = tableWidth + x <= containerwidth ? containerwidth : tableWidth + x;
+                        that.resizeModel.tableWidth = tableWidth;
+                        console.log(tableWidth);
+                    }
+                    else
+                    {
+                        that.resizeModel.fixColWidth = null;
+                        that.resizeModel.tableWidth = containerwidth;
+                    }
+                    var result = width + x;
+                    var splitname = that.resizeModel.target.attr('data-splitname');
+                    var column = libs.Utils.arrayFind(that.options.columns,function(left){
+                        return left.name == splitname;
+                    });
+                    
+                    column.width = result + 'px';
+                    that.adapter.refresh();
+                })
+                .mouseleave(function(event) {
+                    if (!that.resizeModel.resizeing) { return; }
+                    $dom.siblings('.col-split').hide();
+                    that.resizeModel.resizeing = false;                        
+                    var $this = $(this); 
+                    var x = event.clientX - that.resizeModel.dragoffset;
+                    that.resizeModel.dragoffset = event.clientX;                    
+                    var width = that.resizeModel.target.parent().outerWidth();
+                    var containerwidth = $this.parent().outerWidth();
+                    var fixColWidth = $this.find('.fix-column').outerWidth();
+                    var tableWidth = $this.outerWidth();
+                    if(tableWidth - fixColWidth + x >= containerwidth)
+                    {
+                        tableWidth = tableWidth + x <= containerwidth ? containerwidth : tableWidth + x;
+                        that.resizeModel.tableWidth = tableWidth;
+                    }
+                    else
+                    {
+                        that.resizeModel.tableWidth = containerwidth;
+                    }
+                    var result = width + x;
+                    var splitname = that.resizeModel.target.attr('data-splitname');
+                    var column = libs.Utils.arrayFind(that.options.columns,function(left){
+                        return left.name == splitname;
+                    });
+                    
+                    column.width = result + 'px';
+                    that.adapter.refresh();
+                })
+                .mousemove(function(event) {
+                    var $this = $(this);                        
+                    if (!that.resizeModel.resizeing) { return; }
+                    $dom.parent().css('position','relative');
+                    var $split =$dom.siblings('.col-split');
+                    $split.height($('th',$dom).outerHeight());
+                    $split.css('left',event.clientX - that.adapter.container.offset().left + $split.parent().scrollLeft()).show();
+                });   
+                this.events.onbindevents && this.events.onbindevents.apply(this);                
+            },
+            unBindEvents:function(){
+                var that = this;
+                var $dom = $('#'+that.name + that.id);
+                $('th',$dom).off('click');
+                $('tr',$dom).off('click');
+                $('.sel-box',$dom).off('click');
+                $('th .split',$dom).off('mousedown');
+                $dom.off('mouseup').off('mouseleave').off('mousemove');
+                this.events.onunbindevents && this.events.onunbindevents.apply(this);
+            },
+            events: {
+                onsortchanged:function(){
                     var that = this;
-                    var $dom = $('#'+that.name + that.id);
-                    $('th',$dom).off('click');
-                    $('tr',$dom).off('click');
-                    $('.sel-box',$dom).off('click');
-                    $('th .split',$dom).off('mousedown');
-                    $dom.off('mouseup').off('mouseleave').off('mousemove');
-                }
+                    that.adapter.sort();
+                    that.adapter.refresh();
+                },
+                onbindevents:null,
+                onunbindevents:null,
+                onselecdata:null
             }
         };
         return View;
     })();
     libs.Grid = (function(){
         /**
-        * @description 表格控件
-        * @constructor Grid
+        *@description 表格控件
+        *@constructor myui.Grid
+        *@example
+        new myui.Grid({
+            datas:datas,
+            pagedata:true,
+            container:$('.ui-container'),
+            modelName:'data', 
+            modelKey : 'key',
+            displaySize:10,
+            pageSize:5,
+            pageIndex:1,
+            rowHeight:38,
+            footText:'共{0}条数据',
+            rowid:true,
+            rowidwidth:'50px',
+            selectmode:'single',
+            sortmode:'single',
+            showfooter:false,   
+            tableCss:' table-hover table-bordered table-demo',
+            columns:[
+                { 
+                    headText:'',name:'',width:'30px',
+                    format:function(value,data,view) {
+                        return ['<input class="sel-box radio" type="checkbox" name="radio_',view.id,view.adapter.modelName,'" data-modelKey="',data[view.adapter.modelKey],'" ',(view.select == data[view.adapter.modelKey] ? 'checked="checked"':''),'/>'].join('');
+                    }
+                },
+                { headText:'key',name:'key',resizable:true,sortable:true,sorttype:'number',sortlevel:3,sortenable:true,width:'20%'},
+                { headText:'value',name:'value',resizable:true,width:'80%',sortable:true,sortlevel:1,sortenable:false,},
+                { headText:'tag',name:'tag',resizable:true,width:'200px'},
+            ]
+        });
         */
         function Grid(options)
         {
@@ -608,19 +660,42 @@ var myui = (function(libs,$){
             events:{
                 /**
                 *@description 远程数据加载好触发
-                *@event Grid#onLoadComplete
+                *@event myui.Grid#onloadcomplete
+                *@param {object} datas 加载完成的数据集
                 */
-                onLoadComplete:null,
+                onloadcomplete:null,
                 /**
                 *@description 表格渲染后触发
-                *@event Grid#onGridComplete
+                *@event myui.Grid#ongridcomplete
                 */
-                onGridComplete:null,
+                ongridcomplete:null,
                 /**
                 *@description 选中行触发
-                *@event Grid#onSelectRow
+                *@event myui.Grid#onselecdata
+                *@param {object} 数据的主键
                 */
-                onSelectRow:null
+                onselecdata:null,
+                /**
+                *@description 选中行前触发，返回false表示不可以选中
+                *@event myui.Grid#onselectable
+                *@param {object} data 需要判断的数据
+                */
+                onselectable:null,
+                /**
+                *@description 滑动条滑动前触发
+                *@event myui.Grid#onbeforescroll
+                */
+                onbeforescroll:null,
+                /**
+                *@description 滑动条滑动后触发
+                *@event myui.Grid#onafterscroll
+                */
+                onafterscroll:null,
+                /**
+                *@description 页序号发生改变后触发
+                *@event myui.Grid#onpagechanged
+                */
+                onpagechanged:null
             },
             /**
             *@private
@@ -635,8 +710,9 @@ var myui = (function(libs,$){
             /**
             *@public
             *@instance
-            *@memberof Grid
+            *@memberof myui.Grid
             *@method
+            *@param {DataManager} manager 数据管理源
             *@description 附加到数据管理源
             */
             attach:function(manager){
@@ -650,50 +726,50 @@ var myui = (function(libs,$){
                 {
                     if(options.pagedata)
                     {
-                        that.watcher.events.onPageChanged = function(){
+                        that.watcher.events.onpagechanged = function(){
                             that.loadPageData.apply(that);
                         }
-                        that.view.events.onSortChanged = function(){
+                        that.view.events.onsortchanged = function(){
                             that.loadPageData.apply(that);
                         }
                         that.loadPageData.apply(that);
                     }
                     else
                     {
-                        that.view.events.onSortChanged = function(){
+                        that.view.events.onsortchanged = function(){
                             that.loadScrollData.apply(that);
                         }
                         that.loadScrollData.apply(that);
                     }
                 }
-                if(options.datas)
+                else if(options.datas)
                 {
                     if(options.pagedata)
                     {
-                        var datas = that.events.onLoadComplete && that.events.onLoadComplete.apply(that,[options.datas]) || options.datas;
+                        var datas = that.events.onloadcomplete && that.events.onloadcomplete.apply(that,[options.datas]) || options.datas;
                         that.manager.begin();
                         that.watcher.datapager.setCurPage(options.pageIndex,options.pageSize,datas.length);
                         that.manager.clear();
                         that.manager.appendDatas(datas);
                         that.manager.end();
-                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
+                        that.events.ongridcomplete && that.events.ongridcomplete.apply(that);
                     }
                     else
                     {
-                        var datas = that.events.onLoadComplete && that.events.onLoadComplete.apply(that,[options.datas]) || options.datas;
+                        var datas = that.events.onloadcomplete && that.events.onloadcomplete.apply(that,[options.datas]) || options.datas;
                         that.manager.begin();
                         that.watcher.scroller.setCurPos(null,null,datas.length);
                         that.manager.clear();
                         that.manager.appendDatas(datas);
                         that.manager.end();
-                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
+                        that.events.ongridcomplete && that.events.ongridcomplete.apply(that);
                     }
                 }                
             },
             /**
             *@public
             *@instance
-            *@memberof Grid
+            *@memberof myui.Grid
             *@method
             *@description 数据来源是远程就重新加载，是本地则重新刷新
             *@param {json} params 如果是远程数据来源，则向远程发起请求时附加的请求参数，如果是本地数据来源，可为null
@@ -705,17 +781,17 @@ var myui = (function(libs,$){
                 {
                     if(options.pagedata)
                     {
-                        that.watcher.events.onPageChanged = function(){
+                        that.watcher.events.onpagechanged = function(){
                             that.loadPageData.apply(that);
                         }
-                        that.view.events.onSortChanged = function(){
+                        that.view.events.onsortchanged = function(){
                             that.loadPageData.apply(that);
                         }
                         that.loadPageData.apply(that);
                     }
                     else
                     {
-                        that.view.events.onSortChanged = function(){
+                        that.view.events.onsortchanged = function(){
                             that.loadScrollData.apply(that);
                         }
                         that.loadScrollData.apply(that);
@@ -729,7 +805,7 @@ var myui = (function(libs,$){
             /**
             *@private
             *@instance
-            *@memberof Grid
+            *@memberof myui.Grid
             *@method
             */
             loadPageData:function(){
@@ -745,20 +821,20 @@ var myui = (function(libs,$){
                     data:params,
                     dataType:options.dataType,
                     success:function(result){
-                        result = that.events.onLoadComplete && that.events.onLoadComplete.apply(that,[result]) || result;
+                        result = that.events.onloadcomplete && that.events.onloadcomplete.apply(that,[result]) || result;
                         if(!result){ result = { pageIndex:1,pageSize:that.watcher.datapager.pageSize,totalSize:0 }; }
                         that.manager.begin();
                         that.watcher.datapager.setCurPage(result.pageIndex,result.pageSize,result.totalSize);
                         that.manager.clear();
                         that.manager.appendDatas(result.datas);
                         that.manager.end();
-                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
+                        that.events.ongridcomplete && that.events.ongridcomplete.apply(that);
                     }}); 
             },
             /**
             *@private
             *@instance
-            *@memberof Grid
+            *@memberof myui.Grid
             *@method
             */
             loadScrollData:function(){
@@ -772,20 +848,20 @@ var myui = (function(libs,$){
                     data:params,
                     dataType:options.dataType,
                     success:function(result){
-                        result = that.events.onLoadComplete && that.events.onLoadComplete.apply(this,[result]) || result;                                
+                        result = that.events.onloadcomplete && that.events.onloadcomplete.apply(this,[result]) || result;                                
                         if(!result){ result = []; }
                         that.manager.begin();
                         that.watcher.scroller.setCurPos(null,null,result.length);
                         that.manager.clear();
                         that.manager.appendDatas(result);
                         that.manager.end();
-                        that.events.onGridComplete && that.events.onGridComplete.apply(that);
+                        that.events.ongridcomplete && that.events.ongridcomplete.apply(that);
                     }});
             },
             /**
             *@public
             *@instance
-            *@memberof Grid
+            *@memberof myui.Grid
             *@method
             *@description 获取选中的单条数据
             */
@@ -795,7 +871,7 @@ var myui = (function(libs,$){
             /**
             *@public
             *@instance
-            *@memberof Grid
+            *@memberof myui.Grid
             *@method
             *@description 获取选中的多条数据
             */
