@@ -6,7 +6,6 @@ var myui = (function(){
             uniqueid:1
         };
         Utils.unique = function(){
-
             return ++Utils.uniqueid;
         };        
         Utils.strFormat = function() {
@@ -19,23 +18,14 @@ var myui = (function(){
             }
             return str;
         };
+        Utils.strTrim = function(){
+            if (arguments.length == 0)
+                return null;
+            var str = arguments[0];
+            return str.replace(/(^\s*)|(\s*$)/g,"");
+        };
         Utils.trigger = function(event,params){
             return this.events[event] && this.events.apply(this,params);
-        };
-        Utils.extendClass = function (subClass, superClass) {
-            var F = function() {};
-
-            F.prototype = superClass.prototype;
-
-            subClass.prototype = new F();
-
-            subClass.prototype.constructor = subClass;
-
-            subClass.superclass = superClass.prototype;
-
-            if (superClass.prototype.constructor == Object.prototype.constructor) {
-                superClass.prototype.constructor = superClass;
-            }
         };
         Utils.extend = function(obj){
             var length = arguments.length;
@@ -110,6 +100,34 @@ var myui = (function(){
             }
         };
         return Utils;
+    })();
+    //类
+    libs.Class = (function(){
+        var Klass = {};
+        Klass.define = function(methods){
+            var klass = function(){                
+                this.__super = null;
+                this.__constructor && this.__constructor.apply(this,arguments);
+            };
+            methods && libs.Utils.extend(klass.prototype, methods);                        
+            klass.prototype.__super = null;
+            return klass;
+        },
+        Klass.extend = function (superClass,methods) {            
+            var klass = function() {
+                this.__constructor && this.__constructor.apply(this,arguments);
+            };
+            klass.prototype = new superClass();
+            klass.prototype.prototype = superClass.prototype;
+            klass.prototype.prototype.constructor = superClass;
+            methods && libs.Utils.extend(klass.prototype, methods); 
+            if (superClass.prototype.constructor == Object.prototype.constructor) {
+                superClass.prototype.constructor = superClass;
+            }
+            klass.prototype.__super = superClass.prototype;
+            return klass;
+        };
+        return Klass;
     })();
     //集合
     libs.Collections = (function(){
@@ -287,6 +305,44 @@ var myui = (function(){
         Collections.List = List;
         return Collections;
     })();
+    //流程
+    libs.Flow = libs.Class.define({
+        __constructor:function(actions){
+            this.actions = actions || [];
+            this.flows = [];
+        },
+        __trigger : function(index) {
+            if(this.flows.length <= index) return;
+            var flow = this.flows[index];
+            flow && flow();
+        },
+        async:function(){
+            var that = this;
+            for (var i = 0; i < this.actions.length; i++) {
+                var action = this.actions[i];
+                (function(cur,next) {
+                    cur && that.flows.push(
+                        function(){
+                            cur(function(err,result){
+                                if(err){ return; }
+                                that.__trigger(next);
+                            });
+                        }
+                    );
+                })(action,i + 1)
+            };
+            this.flows.length > 0 && that.__trigger(0);
+        },
+        sync:function(){
+            for (var i = 0; i < this.actions.length; i++) {
+                this.actions[i] && this.actions[i]();
+            };
+        },
+        push:function(act){
+            if(!act) return;
+            this.actions.push(act);
+        }
+    });
     //分页
     libs.DataPager = (function () {
         function Pager(options){
