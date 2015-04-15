@@ -652,7 +652,7 @@ var myui = (function(libs,$){
             this.manager = options.manager || new libs.DataViewer.DataManager(options);
             this.options = options;
             this.events = options.events || {};   
-            this.manager && this.attach(this.manager);
+            this.manager && this.initialize(this.manager);
             this.resize();     
         }
 
@@ -715,7 +715,7 @@ var myui = (function(libs,$){
             *@param {DataManager} manager 数据管理源
             *@description 附加到数据管理源
             */
-            attach:function(manager){
+            initialize:function(manager){
                 var that = this;
                 this.manager = manager;
                 this.adapter.manager = manager;

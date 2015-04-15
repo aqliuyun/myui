@@ -18,3 +18,21 @@
 {
 
 }
+
+/**combo input*/
+.myui-combo-input
+{
+
+}
+
+.myui-combo-panel
+{
+	display: none;
+	position: absolute;
+	top:0;
+}
+
+.myui-combo-input-container
+{
+	position: relative;
+}

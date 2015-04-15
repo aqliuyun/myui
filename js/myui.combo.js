@@ -1,7 +1,6 @@
 ;(function (libs,$) {
 	var ComboView = libs.Class.extend(libs.DataViewer.DefaultView,{
 		__constructor:function(options){
-//			this.__super(options);
 			this.id = libs.Utils.unique();
 			this.options = options;
 		},
@@ -44,6 +43,7 @@
             return result;
         },
 	});
+
 	var Combo = libs.Class.define({
 		__constructor:function(options){
 			if(options == null || arguments.length == 0) return;
@@ -53,7 +53,7 @@
 			this.adapter = new libs.DataViewer.DefaultAdapter(options);
 			this.view = new ComboView(options);
 			this.events = options.events || {};
-			this.attach(this.manager);
+			this.initialize();
 		},
 		events:{
 			onloadcomplete:null,
@@ -62,12 +62,11 @@
 			onselecdata:null,
 			onselectable:null,
 		},	
-		attach:function(manager){
+		initialize:function(){
 			var that = this;
-            this.manager = manager;
-            this.adapter.manager = manager;
+            this.adapter.manager = this.manager;
             this.manager.adapter = this.adapter;
-            this.adapter.initialize(this.options,manager,this.view,this.watcher);
+            this.adapter.initialize(this.options,this.manager,this.view,this.watcher);
             var options = this.options;
             if(options.url)
             {
@@ -119,21 +118,90 @@
 		}
 	});
 
-	var InputCombo = libs.Class.extend(Combo,{
-		__constructor:function(){
+    function InputComboWatcher(){
+    	this.condition = null;
+        this.match = null;
+    }
 
+    InputComboWatcher.prototype = {
+        attach:function(adapter){
+            this.adapter = adapter;            
+        },
+        detach:function(){
+            this.adapter = null;
+        },
+        search:function(condition){
+        	this.condition = condition;
+        },
+        watchData:function(allDatas){
+        	if(!this.condition) return allDatas;
+        	var datas = [];
+        	for (var i = 0; i < allDatas.length; i++) {
+        		if(this.match && this.match(allDatas[i],this.condition))
+        		{
+        			datas.push(allDatas[i]);
+        		}
+        	};
+            return datas;
+        }
+    };
+
+	var InputCombo = libs.Class.extend(Combo,{
+		__constructor:function(options){
+			var that = this;
+			this.watcher = new InputComboWatcher();
+			this.watcher.match = options.match || function(data,condition){ return data[that.options.modelText].toString().indexOf(condition) >= 0; }
+			this.__super(options);
 		},
+		attach:function(){
+			var htmls = [];
+			htmls.push('<div class="myui-combo-input-container"><input type="text" class="my-combo-input"/><div class="my-combo-panel"></div></div>');
+			var $container = $(htmls.join(''));
+			this.adapter.container.empty();
+			this.adapter.container.prepend($container);			
+			this.$container = this.adapter.container;
+			this.adapter.container = $container.find('.my-combo-panel');
+			this.bindEvents();
+		},
+		detach:function(){
+			this.unbindEvents();
+			this.$container && this.$container.empty();
+			this.adapter.container = this.$container;
+			this.$container = null;
+		},
+		bindEvents:function(){
+			var that = this;
+			var $dom = this.$container;
+			$('.my-combo-input',$dom).off('input').on('input',function(){
+				var $this = $(this);
+				var value = $this.val();
+				that.watcher.search(value);
+				that.adapter.refresh();
+				if(value.length > 0)
+				{
+					$('.my-combo-panel',$dom).show();
+				}
+				else
+				{
+					$('.my-combo-panel',$dom).hide();
+				}
+			});
+		},
+		unbindEvents:function(){}
 	});
 
 	var DropdownCombo = libs.Class.extend(Combo,{
 		__constructor:function(){
-
+			this.__super(arguments);
 		},
+		attach:function(){
+
+		}
 	});
 
 	var MenuCombo = libs.Class.extend(Combo,{
 		__constructor:function(){
-
+			this.__super(arguments);
 		},		
 	});
 

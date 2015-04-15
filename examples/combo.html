@@ -18,7 +18,7 @@
     	for (var i = 1; i < 100; i++) {
     		datas.push({key:i,value:i})
     	};
-    	new myui.Widgets.Combo({    		
+    	var c = new myui.Widgets.InputCombo({    		
     		datas:datas,
     		modelKey:'key',
     		modelText:'value',
@@ -28,7 +28,8 @@
     				
     			}
     		}
-    	}).show();
+    	});
+        c.attach();
     </script>
 </body>
 </html>

@@ -489,7 +489,7 @@
         DataViewer.DataManager = DataManager;
         DataViewer.DefaultAdapter = DefaultAdapter;
         DataViewer.DefaultView = DefaultView;
-        DataViewer.DefaultWatcher = DefaultWatcher;           
+        DataViewer.DefaultWatcher = DefaultWatcher;       
         DataViewer.create = function(options) {
             var manager = new DataManager(options);
             var view = options.view || new DefaultView();
