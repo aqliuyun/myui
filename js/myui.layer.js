@@ -24,7 +24,6 @@
         this.parent = options.parent || document.body;
         this.state = layerState.normal;
         this.options.zIndex = getzIndex();
-        
     };
     Layer.default_options = {
         zIndex: 2000,

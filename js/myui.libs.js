@@ -103,17 +103,20 @@ var myui = (function(){
     })();
     //类
     libs.Class = (function(){
-        var Klass = {};
-        Klass.define = function(methods){
-            var klass = function(){                
-                this.__super = null;
+        var Klasses = {
+            all:{}
+        };
+        Klasses.define = function(methods){
+            var klass = function(){
                 this.__constructor && this.__constructor.apply(this,arguments);
             };
-            methods && libs.Utils.extend(klass.prototype, methods);                        
-            klass.prototype.__super = null;
+            methods && libs.Utils.extend(klass.prototype, methods);     
+            klass.__super = Object.prototype;                   
+            klass.prototype.__super = function(){};
+            klass.__constructor = klass.prototype.__constructor;
             return klass;
         },
-        Klass.extend = function (superClass,methods) {            
+        Klasses.extend = function (superClass,methods) {            
             var klass = function() {
                 this.__constructor && this.__constructor.apply(this,arguments);
             };
@@ -124,10 +127,30 @@ var myui = (function(){
             if (superClass.prototype.constructor == Object.prototype.constructor) {
                 superClass.prototype.constructor = superClass;
             }
-            klass.prototype.__super = superClass.prototype;
+            klass.__super = superClass.prototype;
+            klass.prototype.__super = function(){
+                if(this.__constructor__cursor == Object.prototype){
+                    this.__constructor__cursor = null;
+                    return;
+                }
+                if(this.__constructor__cursor == null) { this.__constructor__cursor = this.prototype; }
+                var cursor = this.__constructor__cursor;
+                this.__constructor__cursor = this.__constructor__cursor.prototype;
+                cursor.__constructor.apply(this,arguments);                
+            }
+            klass.prototype.__supermethod = function(){
+             if(this.__super__cursor == Object.prototype){
+                    this.__super__cursor = null;
+                    return;
+                }
+                if(this.__super__cursor == null) { this.__super__cursor = this.prototype; }
+                var cursor = this.__super__cursor;
+                this.__super__cursor = this.__super__cursor.prototype;
+                return cursor;   
+            }
             return klass;
         };
-        return Klass;
+        return Klasses;
     })();
     //集合
     libs.Collections = (function(){

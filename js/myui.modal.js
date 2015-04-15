@@ -20,132 +20,69 @@
 		}
 	});
 		
-	libs.Dialog = libs.Class.define({
-		/**
-		*@description 对话框
-		*@constructor myui.Dialog
-		*/
+	libs.ModalDialog = libs.Class.extend(libs.Dialog,{
 		__constructor:function(options){
-			//空构造函数
-			if(arguments.length == 0){ return; }
-			this.id = libs.Utils.unique();
-			this.options = options || {};
-			this.flows = new Record();
-			this.initialize();
-		},
-		events:{
-			/**
-			*@description 弹出前触发
-			*@event myui.Dialog#onshow
-			*/
-			onshow:null,			
-			onshown:null,
-			onhidden:null,
-			onhide:null
+			this.__super(options);
 		},
 		initialize:function() {
 			var that = this;
 
-			var html = this._build();
-			$(document.body).append(html);
+			this.modal = new libs.Layer({});
+			that.__willbuild = true;
 
-			this.flows.set('close',function(){ that.close(); });
-			this.flows.set('hide',function(){ that.hide(); })
+			this.flows.set('close',function(callback){ that.close(); callback && callback(); });
+			this.flows.set('hide',function(callback){ that.hide(); callback && callback(); });
+			this.flows.set('show',function(callback){ that.show(); callback && callback(); });
+			this.flows.set('refresh',function(callback){ that.refresh(); callback && callback(); });
 
 			var options = this.options;			
 			if(!options.actions){return;}
-			var count = options.actions;
+			var count = options.actions.length;
 			for (var i = 0; i < count; i++) {
-				this.flows.set(options.actions[i].name,option.action);
+				var act = options.actions[i];
+				this.flows.set(act.name,act.action);
 			};
 		},
-		_build:function() {
-			var options = this.options;
-			var htmls = [];
-			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog {1}">',this.id,options.dialogCss || ''));
-			if(options.title) {
-				htmls.push(libs.Utils.strFormat('<div class="my-dialog-title {0}">',options.titleCss || ''));
-				htmls.push(options.title);
-				htmls.push('<button data-action="close" type="button" class="my-btn close"><span aria-hidden="true">&times;</span></button>')				
-				htmls.push('</div>');
-			}
-			htmls.push(libs.Utils.strFormat('<div class="my-dialog-body {1}">{0}</div>',options.content,options.contentCss || ''));
-			if(options.buttons)
-			{
-				htmls.push(libs.Utils.strFormat('<div class="my-dialog-foot {0}">',options.footCss || ''));
-				var count = options.buttons.length;
-				for (var i = 0; i < count; i++) {
-					var btn = options.buttons[i];
-					htmls.push(libs.Utils.strFormat('<input type="button" data-action="{2}" data-async="{3}" class="my-btn my-btn-alert {1}" value="{0}"/>',btn.btnText,btn.btnCss || '',btn.action,btn.async || false));
-				};
-				htmls.push('</div>');
-			}
-			htmls.push('</div>');
-			return htmls.join('');
-		},
-		dom:function(){
-			return $('#my_dialog_' + this.id);
-		},
-		refresh:function(){
-			var $dom = this.dom();
-			$(".my-dialog-body",$dom).html(options.content);
-		},
 		show:function(){
-			this.events.onshow && this.events.onshow.apply(this);
-			var $dom = this.dom();
-			$dom.show();
-			this.bindEvents();
-			this.events.onshown && this.events.onshown.apply(this);
+			this.modal.block();
+			if(this.__willbuild){
+				var html = this._build();
+				this.options.parent = this.modal.content();
+				if(this.options.parent.length == 0){ this.options.parent = document.body; }
+				$(this.options.parent).append(html);
+				this.__willbuild = false;
+			}
+			this.__supermethod().show.apply(this);
 		},
 		hide:function(){
-			this.events.onhide && this.events.onhide.apply(this);
-			var $dom = this.dom();
-			$dom.hide();
-			this.unbindEvents();
-			this.events.onhidden && this.events.onhidden.apply(this);
+			this.__supermethod().hide.apply(this);
+			this.modal.unblock();
 		},
 		close:function(){
 			this.hide();
 			var $dom = this.dom();
 			$dom.remove();
+			this.modal.close();
 		},
-		bindEvents:function(){
-			var that = this;
-			var $dom = this.dom();
-			$('.my-btn',$dom).off('click').on('click',function() {
-				var $this = $(this);
-				var data_actions = libs.Utils.strTrim($this.attr('data-action'));
-				var actions = data_actions.split(';');
-				var async = $this.attr('data-async') ? true : false;
-				var flows = [];
-				for (var i = 0; i < actions.length; i++) {
-					flows.push(that.flows.get(actions[i]));
-				};
-				async ? new Flow(flows).async():new Flow(flows).sync();
-			});
-		},
-		unbindEvents:function(){
-			$('.my-btn').off('click');
-		}
 	});
 
-	libs.SimpleAlert = libs.Class.extend(libs.Dialog,{
-		__constructor:function(options){
-			this.__super.__constructor.apply(this,[options]);
+	libs.SimpleModalAlert = libs.Class.extend(libs.ModalDialog,{
+		__constructor:function(options){			
+			this.__super(options);
 		},
-		initialize:function(){
+		initialize:function(){			
 			var that = this;
-			this.__super.initialize.apply(this);
+			this.__supermethod().initialize();
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
 			var options = this.options;
 			var htmls = [];
-			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog {1}">',this.id,options.dialogCss || ''));
+			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog my-dialog-modal {1}">',this.id,options.dialogCss || ''));
 			if(options.title) {
 				htmls.push(libs.Utils.strFormat('<div class="my-dialog-title {0}">',options.titleCss || ''));
 				htmls.push(options.title);
-				htmls.push('<button data-action="close" type="button" class="close" ><span aria-hidden="true">&times;</span></button>')				
+				htmls.push('<button data-action="close" type="button" class="my-btn close" ><span aria-hidden="true">&times;</span></button>')				
 				htmls.push('</div>');
 			}
 			htmls.push(libs.Utils.strFormat('<div class="my-dialog-body {1}">{0}</div>',options.content,options.contentCss || ''));
@@ -155,19 +92,19 @@
 		},
 	});
 
-	libs.SimpleConfirm = libs.Class.extend(libs.Dialog,{
+	libs.SimpleModalConfirm = libs.Class.extend(libs.ModalDialog,{
 		__constructor:function(options){
-			this.__super.__constructor.apply(this,[options]);
+			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__super.initialize.apply(this);
+			this.__supermethod().initialize();
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
 			var options = this.options;
 			var htmls = [];
-			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog {1}">',this.id,options.dialogCss || ''));
+			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog my-dialog-modal {1}">',this.id,options.dialogCss || ''));
 			if(options.title) {
 				htmls.push(libs.Utils.strFormat('<div class="my-dialog-title {0}">',options.titleCss || ''));
 				htmls.push(options.title);
@@ -184,19 +121,19 @@
 		},
 	});
 
-	libs.BlockAlert = libs.Class.extend(libs.Dialog,{
+	libs.AsyncModalAlert = libs.Class.extend(libs.ModalDialog,{
 		__constructor:function(options){
-			this.__super.__constructor.apply(this,[options]);
+			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__super.initialize.apply(this);
+			this.__supermethod().initialize();
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
 			var options = this.options;
 			var htmls = [];
-			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog {1}">',this.id,options.dialogCss || ''));
+			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog my-dialog-modal {1}">',this.id,options.dialogCss || ''));
 			if(options.title) {
 				htmls.push(libs.Utils.strFormat('<div class="my-dialog-title {0}">',options.titleCss || ''));
 				htmls.push(options.title);
@@ -210,19 +147,19 @@
 		},
 	});
 
-	libs.BlockConfirm = libs.Class.extend(libs.Dialog,{
+	libs.AsyncModalConfirm = libs.Class.extend(libs.ModalDialog,{
 		__constructor:function(options){
-			this.__super.__constructor.apply(this,[options]);
+			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__super.initialize.apply(this);
+			this.__supermethod().initialize();
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
 			var options = this.options;
 			var htmls = [];
-			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog {1}">',this.id,options.dialogCss || ''));
+			htmls.push(libs.Utils.strFormat('<div id="my_dialog_{0}" class="my-dialog my-dialog-modal {1}">',this.id,options.dialogCss || ''));
 			if(options.title) {
 				htmls.push(libs.Utils.strFormat('<div class="my-dialog-title {0}">',options.titleCss || ''));
 				htmls.push(options.title);

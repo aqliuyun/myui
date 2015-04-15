@@ -7,7 +7,7 @@ module.exports = function (grunt) {
         dest: 'dist/myui.css'
       },
       js:{
-        src: ['js/myui.libs.js','js/*.js'],
+        src: ['js/myui.libs.js','js/*.js','js/myui.modal.js'],
         dest: 'dist/myui.js'
       }
     },  

@@ -1,0 +1,57 @@
+.my-dialog {
+	display: none;
+	border:1px solid #ddd;
+	background-color: #fff;	
+}
+
+.my-dialog .close
+{
+	-webkit-appearance:none;
+	border:0;
+	background: transparent;
+	cursor:pointer;
+	padding: 0;
+	opacity:0.2;
+	filter:alpha(opacity=20);
+	float: right;
+	text-shadow:0 1px 0 #fff;
+	color:#000;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.my-dialog .close:hover
+{
+	opacity: 0.4;
+	filter:alpha(opacity=40);
+}
+
+.my-dialog-modal
+{
+	margin-top: 10%;
+}
+
+.my-dialog-default {
+	width:600px;
+	margin: 0 auto;
+}
+
+.my-dialog-title{
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+}
+
+.my-dialog-body{
+	padding: 20px;
+	min-height: 150px;
+}
+
+.my-dialog-foot{
+	text-align: center;
+	border-top:1px solid #ddd;
+	padding: 10px 10px 10px 0px;
+}
+
+.my-dialog .my-btn{
+	margin-left: 10px;
+}
