@@ -1,7 +1,7 @@
 (function(libs,$) {
 
 	var Flow = libs.Flow;
-
+	var Dialog = libs.Widgets.Dialog;
 	var Record = libs.Class.define({
 		__constructor:function(){
 			this.actions = {};
@@ -20,7 +20,7 @@
 		}
 	});
 		
-	libs.ModalDialog = libs.Class.extend(libs.Dialog,{
+	var ModalDialog = libs.Class.extend(Dialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
@@ -52,10 +52,10 @@
 				$(this.options.parent).append(html);
 				this.__willbuild = false;
 			}
-			this.__supermethod().show.apply(this);
+			ModalDialog.__super.show.apply(this);
 		},
 		hide:function(){
-			this.__supermethod().hide.apply(this);
+			ModalDialog.__super.hide.apply(this);
 			this.modal.unblock();
 		},
 		close:function(){
@@ -66,13 +66,13 @@
 		},
 	});
 
-	libs.SimpleModalAlert = libs.Class.extend(libs.ModalDialog,{
+	var SimpleModalAlert = libs.Class.extend(ModalDialog,{
 		__constructor:function(options){			
 			this.__super(options);
 		},
 		initialize:function(){			
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			SimpleModalAlert.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -92,13 +92,13 @@
 		},
 	});
 
-	libs.SimpleModalConfirm = libs.Class.extend(libs.ModalDialog,{
+	var SimpleModalConfirm = libs.Class.extend(ModalDialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			SimpleModalConfirm.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -121,13 +121,13 @@
 		},
 	});
 
-	libs.AsyncModalAlert = libs.Class.extend(libs.ModalDialog,{
+	var AsyncModalAlert = libs.Class.extend(ModalDialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			AsyncModalAlert.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -147,13 +147,13 @@
 		},
 	});
 
-	libs.AsyncModalConfirm = libs.Class.extend(libs.ModalDialog,{
+	var AsyncModalConfirm = libs.Class.extend(ModalDialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			AsyncModalConfirm.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -175,4 +175,11 @@
 			return htmls.join('');
 		},
 	});
+
+	libs.Widgets = libs.Widgets || {};
+	libs.Widgets.ModalDialog = ModalDialog;
+	libs.Widgets.SimpleModalAlert = SimpleModalAlert;
+	libs.Widgets.SimpleModalConfirm = SimpleModalConfirm;
+	libs.Widgets.AsyncModalAlert = AsyncModalAlert;
+	libs.Widgets.AsyncModalConfirm = AsyncModalConfirm;
 })(myui,jQuery);

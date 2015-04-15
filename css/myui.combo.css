@@ -1,0 +1,20 @@
+.myui-combo
+{
+	border:1px solid #ddd;
+}
+
+.myui-combo-item
+{
+	padding: 5px;
+	border-bottom: 1px solid #ddd;
+}
+
+.myui-combo-item:last-child
+{
+	border-bottom: 0;
+}
+
+.myui-combo-item.highlight
+{
+
+}

@@ -20,7 +20,7 @@
 		}
 	});
 		
-	libs.Dialog = libs.Class.define({
+	var Dialog = libs.Class.define({
 		/**
 		*@description 对话框
 		*@constructor myui.Dialog
@@ -28,7 +28,6 @@
 		__constructor:function(options){
 			//空构造函数			
 			if(arguments.length == 0 || options == null){ return; }
-			console.log('dialog __constructor')
 			this.id = libs.Utils.unique();
 			this.options = options || {};
 			this.flows = new Record();
@@ -135,13 +134,13 @@
 		}
 	});
 
-	libs.SimpleAlert = libs.Class.extend(libs.Dialog,{
+	var SimpleAlert = libs.Class.extend(Dialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			SimpleAlert.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -161,13 +160,13 @@
 		},
 	});
 
-	libs.SimpleConfirm = libs.Class.extend(libs.Dialog,{
+	var SimpleConfirm = libs.Class.extend(Dialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			SimpleConfirm.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -190,13 +189,13 @@
 		},
 	});
 
-	libs.AsyncAlert = libs.Class.extend(libs.Dialog,{
+	var AsyncAlert = libs.Class.extend(Dialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			AsyncAlert.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -216,13 +215,13 @@
 		},
 	});
 
-	libs.AsyncConfirm = libs.Class.extend(libs.Dialog,{
+	var AsyncConfirm = libs.Class.extend(Dialog,{
 		__constructor:function(options){
 			this.__super(options);
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize.apply(this);
+			AsyncConfirm.__super.initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -244,4 +243,11 @@
 			return htmls.join('');
 		},
 	});
+
+	libs.Widgets = libs.Widgets || {};
+	libs.Widgets.Dialog = Dialog;
+	libs.Widgets.SimpleAlert = SimpleAlert;
+	libs.Widgets.SimpleConfirm = SimpleConfirm;
+	libs.Widgets.AsyncAlert = AsyncAlert;
+	libs.Widgets.AsyncConfirm = AsyncConfirm;
 })(myui,jQuery);
