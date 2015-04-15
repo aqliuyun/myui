@@ -72,7 +72,7 @@
 		},
 		initialize:function(){			
 			var that = this;
-			this.__supermethod().initialize();
+			this.__supermethod().initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -98,7 +98,7 @@
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize();
+			this.__supermethod().initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -127,7 +127,7 @@
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize();
+			this.__supermethod().initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
@@ -153,7 +153,7 @@
 		},
 		initialize:function(){
 			var that = this;
-			this.__supermethod().initialize();
+			this.__supermethod().initialize.apply(this);
 			this.flows.set('done',function(callback){ that.options.done.apply(that,[callback]); });
 		},
 		_build:function(){
