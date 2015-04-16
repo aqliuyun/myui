@@ -43,7 +43,7 @@
 		},
 		attach:function(){
 			var htmls = [];
-			htmls.push('<div class="myui-inputcombo" tabindex="-1"><div class="myui-combo-input-container"><input type="text" class="myui-combo-input" tableindex="0"/></div><div class="myui-combo-panel" tabindex="1"></div></div>');
+			htmls.push('<div class="myui-inputcombo" tabindex="-1"><div class="myui-combo-input-container"><input type="text" class="myui-combo-input" tableindex="-1"/></div><div class="myui-combo-panel" tabindex="-1"></div></div>');
 			var $container = $(htmls.join(''));
 			this.adapter.container.empty();
 			this.adapter.container.prepend($container);			
@@ -57,6 +57,12 @@
 			this.adapter.container = this.$container;
 			this.$container = null;
 		},
+		__getkeepshow:function(){
+			return this.__keepshow;
+		},
+		__setkeepshow:function(k) {
+			this.__keepshow = k;
+		},
 		getSelectData:function(){
 			return this.view.getSelectData();
 		},
@@ -67,13 +73,13 @@
 				if(event.keyCode == 38)
 				{
 					that.view.selectPrev();
-					$('.myui-combo-input',$dom).off('blur');
+					$('.myui-combo-input',$dom).off('focusout');
 					$('.myui-combo-panel',$dom).focus();
 				}
 				else if(event.keyCode == 40)
 				{
 					that.view.selectNext();
-					$('.myui-combo-input',$dom).off('blur');
+					$('.myui-combo-input',$dom).off('focusout');
 					$('.myui-combo-panel',$dom).focus();
 				}
 				else if(event.keyCode == 13)
@@ -82,6 +88,17 @@
 					that.view.setSelectable(false);
 					return true;
 				}		
+				else
+				{					
+					$('.myui-combo-input',$dom).off('focusout').on('focusout',function(){
+						setTimeout(function() {
+							if(that.__getkeepshow()){return;}
+							$('.myui-combo-panel',$dom).hide();
+							that.view.setSelectable(false);
+						},100);						
+						return true;
+					});
+				}
 				return true;
 			});
 			$('.myui-combo-input',$dom).off('input').on('input',function(){
@@ -110,15 +127,20 @@
 				}
 				return true;
 			});
-			$('.myui-combo-panel,.myui-inputcombo',$dom).off('blur').on('blur',function(){				
-				$('.myui-combo-panel',$dom).hide();
-				that.view.setSelectable(false);
+			$('.myui-combo-panel',$dom).off('mousedown').on('mousedown',function(){
+				that.__setkeepshow(true);
 				return true;
 			});
-			// $('.myui-combo-input',$dom).off('blur').on('blur',function(){		
-			// 	$('.myui-combo-panel',$dom).hide();
-			// 	that.view.setSelectable(false);
-			// });
+			$('.myui-combo-panel',$dom).off('focusin').on('focusin',function(){	
+				that.__setkeepshow(true);
+				return true;
+			});
+			$('.myui-combo-panel',$dom).off('focusout').on('focusout',function(){						
+				$('.myui-combo-panel',$dom).hide();
+				that.view.setSelectable(false);
+				that.__setkeepshow(false);
+				return true;
+			});
 			var onselectdata = that.view.events.onselectdata;
 			that.view.events.onselectdata = function(key){
 				if(that.options.selectmode == 'multiple')

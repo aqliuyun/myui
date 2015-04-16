@@ -28,7 +28,7 @@
         	}
         	var modelKey = data[this.options.modelKey];
         	var highlight = (libs.Utils.arrayContains(this.selects,modelKey) || this.select == modelKey);
-            return ['<div class="myui-combo-item ',highlight?'highlight':'',this.options.comboItemCss || '', '" id="', this.viewId(data,viewIndex), '" data-modelKey="',data[this.options.modelKey],'" data-viewIndex="',viewIndex,'">', output, '</div>'].join('')
+            return ['<div class="myui-combo-item ',highlight?'highlight':'',this.options.comboItemCss || '', '" id="', this.viewId(data,viewIndex), '" data-modelKey="',data[this.options.modelKey],'" data-viewIndex="',viewIndex,'" >', output, '</div>'].join('')
         },
         //渲染尾部
         renderFoot: function() {
