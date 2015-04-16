@@ -8,24 +8,32 @@
     <link href="../scripts/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>-->
     <link href="../dist/myui.css" type="text/css" rel="stylesheet"/>
     <script src="../dist/myui.js" type="text/javascript"></script>
+    <style type="text/css" media="screen">
+        .test
+        {
+            width:150px;
+            margin-left: 200px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
-<body class="myui" onselectstart="return false;">    
-	<div class="test">
-		
-	</div><!-- / -->
+<body class="myui" onselectstart="return false;">       
+	<div class="test" tabindex="0"></div>
     <script type="text/javascript">
     	var datas = [];
     	for (var i = 1; i < 100; i++) {
-    		datas.push({key:i,value:i})
+    		datas.push({key:i,value:'data'+i})
     	};
-    	var c = new myui.Widgets.InputCombo({    		
+    	var c = new myui.Widgets.InputCombo({    
+            selectmode:'single'		,
     		datas:datas,
+            displaySize:5,
     		modelKey:'key',
     		modelText:'value',
     		container:$('.test'),
     		events:{
-    			onselectdata:function (argument) {
-    				
+    			onselectdata:function (key) {
+    				console.log(key);
     			}
     		}
     	});

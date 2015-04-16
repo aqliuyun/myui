@@ -102,7 +102,6 @@ var myui = (function(){
         };
         libs.Utils = Utils;
     })();
-
     //类
     (function(){
         libs.Class = {};

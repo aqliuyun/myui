@@ -16,6 +16,7 @@ module.exports = function (grunt) {
         'js/myui.dialog.js',
         'js/myui.modal.js',
         'js/myui.combo.js',
+        'js/myui.inputcombo.js',
         ],
         dest: 'dist/myui.js'
       }

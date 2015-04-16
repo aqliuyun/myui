@@ -399,7 +399,7 @@ var myui = (function(libs,$){
             },
             selectKey: function (key) {
                 this.select = key;
-                this.events.onselecdata && this.events.onselecdata.apply(this, [key]);
+                this.events.onselectdata && this.events.onselectdata.apply(this, [key]);
             },
             //绑定view事件
             bindEvents: function(){
@@ -603,7 +603,7 @@ var myui = (function(libs,$){
                 },
                 onbindevents:null,
                 onunbindevents:null,
-                onselecdata:null
+                onselectdata:null
             }
         };
         return View;
@@ -671,10 +671,10 @@ var myui = (function(libs,$){
                 ongridcomplete:null,
                 /**
                 *@description 选中行触发
-                *@event myui.Grid#onselecdata
+                *@event myui.Grid#onselectdata
                 *@param {object} 数据的主键
                 */
-                onselecdata:null,
+                onselectdata:null,
                 /**
                 *@description 选中行前触发，返回false表示不可以选中
                 *@event myui.Grid#onselectable

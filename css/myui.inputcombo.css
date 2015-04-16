@@ -1,0 +1,34 @@
+.myui-inputcombo
+{
+	width: 100%;
+	position: relative;
+}
+
+.myui-combo-panel
+{
+	width: 100%;
+	display: none;
+	position: absolute;
+	background-color: #fff;
+	top:30px;	
+}
+
+.myui-combo-panel:focus
+{
+	outline: 0px;
+}
+
+.myui-combo-input-container
+{
+	width: 100%;
+	border: 1px solid #ddd;
+	padding: 5px;
+}
+
+.myui-combo-input
+{
+	border: 0px;
+	padding: 0px;
+	width:100%;
+	outline: none;
+}

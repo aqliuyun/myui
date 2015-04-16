@@ -14,25 +14,12 @@
 	border-bottom: 0;
 }
 
+.myui-combo-item:hover
+{
+	background-color: #f9f9f9;
+}
+
 .myui-combo-item.highlight
 {
-
-}
-
-/**combo input*/
-.myui-combo-input
-{
-
-}
-
-.myui-combo-panel
-{
-	display: none;
-	position: absolute;
-	top:0;
-}
-
-.myui-combo-input-container
-{
-	position: relative;
+	background-color: #286090;
 }
