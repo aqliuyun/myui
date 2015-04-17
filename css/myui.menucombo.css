@@ -1,26 +1,22 @@
-.myui-combo
+.myui-menu
 {
 	border:1px solid #ddd;
 	background-color: #fff;
+	position: fixed;
 }
 
-.myui-combo-item
+.myui-menu-item
 {
 	padding: 5px;
 	border-bottom: 1px solid #ddd;
 }
 
-.myui-combo-item:last-child
+.myui-menu-item:last-child
 {
 	border-bottom: 0;
 }
 
-.myui-combo-item:hover
+.myui-menu-item:hover
 {
 	background-color: #f9f9f9;
-}
-
-.myui-combo-item.highlight
-{
-	background-color: #286090;
 }

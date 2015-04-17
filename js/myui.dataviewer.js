@@ -42,6 +42,10 @@
             count: function() {
                 return this.datas.length;
             },
+            //获取所有数据
+            getDatas:function(){
+                return this.datas;
+            },
             //根据modelKey找到客户端
             findData: function(key) {
                 return this.hashs.item(key);
@@ -573,7 +577,6 @@
             },
             update:function(data){
                 this.adapters.forEach(function (adapter) {
-                    console.log(1);
                     adapter.update(data);
                 });
             },

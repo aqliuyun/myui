@@ -6,6 +6,7 @@
 
 .myui-combo-panel
 {
+	min-width: 100px;
 	width: 100%;
 	display: none;
 	position: absolute;
@@ -25,10 +26,11 @@
 	padding: 5px;
 }
 
-.myui-combo-input
+input.myui-combo-input
 {
 	border: 0px;
 	padding: 0px;
+	margin:0px;
 	width:100%;
 	outline: none;
 }

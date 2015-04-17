@@ -39,12 +39,19 @@
 			var that = this;
 			this.watcher = new InputComboWatcher(options);
 			this.watcher.match = options.match || function(data,condition){ return data[that.options.modelText].toString().indexOf(condition) >= 0; }
+			var container = options.container;
+			options.container = null;
 			this.__super(options);
+			if(container)
+			{
+				this.attach(container);
+			}
 		},
-		attach:function(){
+		attach:function(target){
 			var htmls = [];
 			htmls.push('<div class="myui-inputcombo" tabindex="-1"><div class="myui-combo-input-container"><input type="text" class="myui-combo-input" tableindex="-1"/></div><div class="myui-combo-panel" tabindex="-1"></div></div>');
 			var $container = $(htmls.join(''));
+			this.adapter.container = target;
 			this.adapter.container.empty();
 			this.adapter.container.prepend($container);			
 			this.$container = this.adapter.container;
@@ -65,6 +72,9 @@
 		},
 		getSelectData:function(){
 			return this.view.getSelectData();
+		},
+		getSelectDatas:function(){
+			return this.view.getSelectDatas();
 		},
 		bindEvents:function(){
 			var that = this;
@@ -177,7 +187,11 @@
 			var $dom = this.$container;
 			$('.myui-combo-input',$dom).off('input');
 			$('.myui-combo-panel,.myui-combo-input',$dom).off('keydown');
-			$('.myui-combo-panel,.myui-inputcombo',$dom).off('blur')
+			$('.myui-combo-panel,.myui-inputcombo',$dom).off('blur');
+			$('.myui-combo-panel',$dom).off('focusin');
+			$('.myui-combo-panel',$dom).off('mousedown');
+			$('.myui-combo-panel',$dom).off('focusout');
+			$('.myui-combo-input',$dom).off('focusout');
 		}
 	});
 
