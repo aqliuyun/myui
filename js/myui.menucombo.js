@@ -6,10 +6,10 @@
 			this.id = libs.Utils.unique();
 			this.options = options;
 			this.events = this.options.events || {};
-			this.container = this.options.container;
+			this.container = $(this.options.container);
 		},
 		dom:function () {
-			return $(this.container);
+			return this.container;
 		},
 		getMenuItem:function(key){
 			return $('.myui-menu-item[data-modelKey='+key + ']',this.dom());
@@ -26,7 +26,8 @@
 			});
 		},
 		getSubMenuOffset:function(key){
-			var $container = this.dom()
+			var $container = this.dom();
+			
 			var offset =  $('.myui-menu-item[data-modelKey='+key + ']',$container).offset()
 			offset.left += $('.myui-menu-item[data-modelKey='+key + ']',$container).outerWidth() + 2;
 			return offset;
@@ -36,21 +37,21 @@
             return libs.Utils.strFormat('<div class="myui-menucombo myui-menu {0}" style="left:{1}px;top:{2}px;" data-modelKey="{3}" data-parentKey="{4}" data-level="{5}">',this.options.comboCss || '',left,top,key,parentKey,level);
         },
         //渲染主题部分
-        renderBody: function(data,viewIndex) {
+        renderBody: function(menuitem,viewIndex) {
         	var output = '';
         	if(this.options.format){
-        		output = this.options.format.apply(this,[data]) || '';
+        		output = this.options.format.apply(this,[menuitem,menuitem.data]) || '';
         	}
         	else if(this.options.modelText)
         	{
-        		output = data.text;
+        		output = menuitem.text;
         	}
         	else
         	{
-        		output = data.value;
+        		output = menuitem.value;
         	}
-        	var modelKey = data.key;
-            return ['<div class="myui-menu-item ',this.options.comboItemCss || '', '" data-modelKey="',modelKey,'" data-viewIndex="',viewIndex,'" data-action="',data.action,'" data-async="',data.async,'">', output, '</div>'].join('')
+        	var modelKey = menuitem.key;
+            return ['<div class="myui-menu-item ',this.options.comboItemCss || '', '" data-modelKey="',modelKey,'" data-viewIndex="',viewIndex,'" data-action="',menuitem.action,'" data-async="',menuitem.async,'">', output, '</div>'].join('')
         },
         //渲染尾部
         renderFoot: function() {
@@ -100,6 +101,7 @@
 			this.level = 0;
 			this.action = '';
 			this.async = false;
+			this.data = null;
 		}
 	});
 
@@ -111,14 +113,10 @@
 			this.popups = [];
 			this.options = options;
 			this.flows = new Record();
-			this.container = options.container;
+			this.container = $(options.container);
 			if(options.datas.length)
 			{
 				this.load(options.datas);
-			}
-			else
-			{
-				this.parse(options.datas);
 			}
 			this.flows.set('close',function(callback){ that.close(); callback && callback(); });
 			if(!options.actions){return;}
@@ -136,6 +134,7 @@
 			for (var i = 0; i < datas.length; i++) {
 				var data = datas[i];
 				var menuitem = new MenuItem();
+				menuitem.data = data;
 				menuitem.action = data.action || 'close';
 				menuitem.async = data.async || false;
 				menuitem.text = data[this.options.modelText];
@@ -149,9 +148,6 @@
 				parentmenu.action = '';
 				parentmenu.children.push(menuitem);	
 			};
-		},
-		parse:function(datas){
-
 		},
 		bindEvents:function(){
 			var that = this;

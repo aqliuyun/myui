@@ -10,13 +10,14 @@
     <link href="../dist/myui.css" type="text/css" rel="stylesheet"/>
     <script src="../dist/myui.js" type="text/javascript"></script>
     <style type="text/css" media="screen">
-        .test{
+        .test1{
             width:200px;
         }
     </style>
 </head>
 <body class="myui" onselectstart="return false;"> 
-    <div class="test" tabindex="0" style="width:800px;height:600px;border:1px dashed #ddd;" oncontextmenu="return false;"></div>
+    <div class="test1"></div>
+    <div class="test2" tabindex="0" style="margin-left:100px;margin-top:20px;width:800px;height:600px;border:1px dashed #ddd;" oncontextmenu="return false;"></div>
 
     <script type="text/javascript">
     	var datas = [];
@@ -29,9 +30,9 @@
             displaySize:5,
     		modelKey:'key',
     		modelText:'value',
-    		container:$('.test'),
+    		container:$('.test1'),
             format:function(data){
-                return '' + data.value;
+                return '<i class="glyphicon glyphicon-floppy-save"></i>&nbsp;' + data.value;
             },
     		events:{
     			onselectdata:function (key) {
@@ -58,7 +59,7 @@
             datas:source,
             modelKey :'id',
             modelText:'title',
-            container:$('.test'),
+            container:$('.test2'),
             actions:[
                 {
                     name:'done1',action:function(callback){
@@ -68,7 +69,10 @@
                         },2000);
                     }
                 }
-            ]
+            ],
+            format:function(menuitem,data){                
+                return data.title +  (menuitem.children ? '<i class="glyphicon glyphicon-play"></i>':'');
+            }
         });
     </script>
 </body>
