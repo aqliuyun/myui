@@ -369,6 +369,24 @@ var myui = (function(){
         }
     });
 
+    libs.ActionRecord = libs.Class.define({
+        __constructor:function(){
+            this.actions = {};
+        },
+        trigger:function(action){
+            return this.actions[action] && this.actions[action].apply(this);
+        },
+        get:function(action){
+            return this.actions[action];
+        },
+        set:function(action,callback){
+            this.actions[action] = callback;
+        },
+        remove:function(act){
+            delete this.actions[action];
+        }
+    });
+
     //固定分页
     libs.DataPager = (function () {
         function Pager(options){

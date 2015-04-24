@@ -2,23 +2,7 @@
 
 	var Flow = libs.Flow;
 
-	var Record = libs.Class.define({
-		__constructor:function(){
-			this.actions = {};
-		},
-		trigger:function(action){
-			return this.actions[action] && this.actions[action].apply(this);
-		},
-		get:function(action){
-			return this.actions[action];
-		},
-		set:function(action,callback){
-			this.actions[action] = callback;
-		},
-		remove:function(act){
-			delete this.actions[action];
-		}
-	});
+	var Record = libs.ActionRecord;
 		
 	var Dialog = libs.Class.define({
 		/**
