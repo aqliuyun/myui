@@ -5,7 +5,7 @@
 			this.options = options;
 			this.select = null;
 			this.selects = [];
-			this.events = this.options.events;
+			this.events = this.options.events || {};
 			this.selectIndex = null;
 			this.selectable = false;
 		},

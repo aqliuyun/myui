@@ -387,6 +387,24 @@ var myui = (function(){
         }
     });
 
+    //坐标计算类
+    (function(){
+        libs.Position = {
+            getOffsetPosition:function(element){
+                var left = 0;
+                var top = 0;
+                var obj = element;
+                while(obj != document.body && obj != null)
+                {
+                    left += obj.offsetLeft;
+                    top += obj.offsetTop;
+                    obj = obj.offsetParent;
+                }
+                return { "left":left,"top":top };
+            }
+        }        
+    })();
+
     //固定分页
     libs.DataPager = (function () {
         function Pager(options){

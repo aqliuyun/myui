@@ -24,3 +24,19 @@
 {
 	background-color: #286090;
 }
+
+.myui-combo-panel
+{
+	min-width: 100px;
+	width: 100%;
+	display: none;
+	position: absolute;
+	background-color: #fff;
+	top:30px;
+	z-index: 1;
+}
+
+.myui-combo-panel:focus
+{
+	outline: 0px;
+}

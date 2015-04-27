@@ -4,26 +4,12 @@
 	position: relative;
 }
 
-.myui-combo-panel
-{
-	min-width: 100px;
-	width: 100%;
-	display: none;
-	position: absolute;
-	background-color: #fff;
-	top:30px;	
-}
-
-.myui-combo-panel:focus
-{
-	outline: 0px;
-}
-
 .myui-combo-input-container
 {
 	width: 100%;
 	border: 1px solid #ddd;
 	padding: 5px;
+	cursor:text;
 }
 
 input.myui-combo-input

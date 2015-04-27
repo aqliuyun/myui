@@ -1,0 +1,57 @@
+.myui-selectcombo
+{
+	width: 100%;
+	position: relative;
+}
+
+.myui-selectcombo .myui-combo-panel
+{
+	min-width: 100px;
+	width: 100%;
+	display: none;
+	position: absolute;
+	background-color: #fff;
+	top:30px;	
+}
+
+.myui-selectcombo .myui-combo-panel:focus
+{
+	outline: 0px;
+}
+
+.myui-selectcombo .myui-combo-input-container
+{
+	width: 100%;
+	border: 1px solid #ddd;
+	padding: 5px;
+	display: table;
+}
+
+.myui-selectcombo input.myui-combo-input
+{
+	border: 0px;
+	padding: 0px;
+	margin:0px;
+	width:100%;
+	outline: none;
+	display: table-cell;
+}
+
+.myui-selectcombo input.myui-combo-input.readonly
+{
+	pointer-events:none;
+}
+
+.myui-selectcombo .myui-dropdown-btn
+{
+	font-family: Arial;
+	width: 1%;
+	display:table-cell;
+	color:#999;
+	cursor: pointer;
+}
+
+.myui-selectcombo .myui-dropdown-btn:hover
+{
+	color:#333;
+}

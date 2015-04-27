@@ -18,7 +18,7 @@
 			return $('.myui-menucombo[data-modelKey='+key + ']',this.dom());
 		},
 		getSubMenu:function(key){
-			return $('.myui-menucombo[data-parentKey='+key + ']',this.dom());	
+			return $('.myui-menucombo[data-parentKey='+key + ']',this.dom());
 		},
 		getSubMenus:function(level){
 			return $('.myui-menucombo[data-level]',this.dom()).not(function(){
@@ -26,10 +26,11 @@
 			});
 		},
 		getSubMenuOffset:function(key){
-			var $container = this.dom();
-			
-			var offset =  $('.myui-menu-item[data-modelKey='+key + ']',$container).offset()
-			offset.left += $('.myui-menu-item[data-modelKey='+key + ']',$container).outerWidth() + 2;
+			var $container = this.dom();			
+			var $obj = $('.myui-menu-item[data-modelKey='+key + ']',$container);
+			var offset =  libs.Position.getOffsetPosition($obj.get(0));
+			console.log(offset);
+			offset.left += $obj.outerWidth() + 3;
 			return offset;
 		},
 	    //渲染头部
@@ -167,8 +168,8 @@
 			this.container.on('mousedown',function(event){
 				if(event.which == 3)
 				{
-					that.close();
-					that.popup(event.clientX,event.clientY);
+					that.close();					
+					that.popup(document.body.scrollLeft + event.clientX,document.body.scrollTop + event.clientY);
 				}
 				else
 				{

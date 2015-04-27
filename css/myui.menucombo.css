@@ -1,12 +1,12 @@
 .myui-menucombo
 {
-	position: fixed;
+	position: absolute;
 }
 .myui-menu
 {
 	border:1px solid #ddd;
 	background-color: #fff;
-	position: fixed;
+	position: absolute;
 }
 
 .myui-menu-item

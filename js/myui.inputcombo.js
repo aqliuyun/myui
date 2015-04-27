@@ -3,7 +3,7 @@
     	this.options = options || {};
     	this.condition = null;
         this.match = null;
-        this.displaySize = options.displaySize;
+        this.displaySize = this.options.displaySize;
     }
 
     var Combo = libs.Widgets.Combo;
@@ -36,6 +36,7 @@
 
 	var InputCombo = libs.Class.extend(Combo,{
 		__constructor:function(options){
+			if(options == null || arguments.length == 0) return;
 			var that = this;
 			this.watcher = new InputComboWatcher(options);
 			this.watcher.match = options.match || function(data,condition){ return data[that.options.modelText].toString().indexOf(condition) >= 0; }
@@ -49,13 +50,23 @@
 		},
 		attach:function(target){
 			var htmls = [];
-			htmls.push('<div class="myui-inputcombo" tabindex="-1"><div class="myui-combo-input-container"><input type="text" class="myui-combo-input" tableindex="-1"/></div><div class="myui-combo-panel" tabindex="-1"></div></div>');
+			htmls.push('<div class="myui-inputcombo" tabindex="-1"><div class="myui-combo-input-container">');
+			htmls.push('<input type="text" class="myui-combo-input" tableindex="-1"/>');
+			htmls.push('</div><div class="myui-combo-panel" tabindex="-1"></div></div>');
 			var $container = $(htmls.join(''));
 			this.adapter.container = target;
 			this.adapter.container.empty();
 			this.adapter.container.prepend($container);			
 			this.$container = this.adapter.container;
 			this.adapter.container = $container.find('.myui-combo-panel');
+			if(this.options.inputprops)
+			{
+				var props = this.options.inputprops;
+				var $input = $('.myui-combo-input',$container);
+				for (var prop in props) {
+					$input.prop(prop,props[prop]);
+				};
+			}
 			this.bindEvents();
 		},
 		detach:function(){
@@ -84,19 +95,20 @@
 				{
 					that.view.selectPrev();
 					$('.myui-combo-input',$dom).off('focusout');
-					$('.myui-combo-panel',$dom).focus();
+					$('.myui-combo-panel',$dom).focus();					
+					return false;
 				}
 				else if(event.keyCode == 40)
 				{
 					that.view.selectNext();
 					$('.myui-combo-input',$dom).off('focusout');
 					$('.myui-combo-panel',$dom).focus();
+					return false;
 				}
 				else if(event.keyCode == 13)
 				{
 					$('.myui-combo-panel',$dom).hide();
 					that.view.setSelectable(false);
-					return true;
 				}		
 				else
 				{					
@@ -137,7 +149,7 @@
 				}
 				return true;
 			});
-			$('.myui-combo-panel',$dom).off('mousedown').on('mousedown',function(){
+			$('.myui-combo-panel',$dom).off('mousedown').on('mousedown',function(event){
 				that.__setkeepshow(true);
 				return true;
 			});
@@ -196,5 +208,6 @@
 	});
 
 	libs.Widgets = libs.Widgets || {};
+	libs.Widgets.InputComboWatcher = InputComboWatcher;
 	libs.Widgets.InputCombo = InputCombo;
 })(myui,jQuery);

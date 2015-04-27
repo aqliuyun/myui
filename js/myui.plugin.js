@@ -17,7 +17,8 @@
 		if(data == null)
 		{
 			var default_options = libs[plugin].default_options || {};
-			var opts = $.extend({}, default_options,options);			
+			var opts = $.extend({}, default_options,options);
+			opts.container = $this;			
 			data = new libs[plugin](opts);
 			$this.data('myui-plugin',data);
 		}
