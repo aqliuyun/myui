@@ -32,16 +32,15 @@ var myui = (function(){
             var length = arguments.length;
             if (length < 2 || obj == null) return obj;
             for (var index = 1; index < length; index++) {
-                var source = arguments[index],
-                keys = Object.keys(source || {});
-                var l = keys.length;
-                for (var i = 0; i < l; i++) {
-                  var key = keys[i];
-                  obj[key] = source[key];
+                var source = arguments[index];
+                for (key in source){
+                    if(source.hasOwnProperty(key)) {
+                        obj[key] = source[key];
+                    }                  
                 }
             }
             return obj;
-        }
+        };
         Utils.randIntRange = function (begin,end){
             return Math.ceil(Math.random() * (end - begin)) + begin;
         };
@@ -401,6 +400,12 @@ var myui = (function(){
                     obj = obj.offsetParent;
                 }
                 return { "left":left,"top":top };
+            },
+            scrollTop:function(){
+                return document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+            },
+            scrollLeft:function(){
+                return document.documentElement.scrollLeft || window.pageXOffset || document.body.scrollLeft;
             }
         }        
     })();

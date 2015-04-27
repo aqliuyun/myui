@@ -31,10 +31,10 @@
                 this.adapter && this.adapter.clear && this.adapter.clear();
             },
             begin:function () {
-                this.adapter && this.adapter.switch(false);
+                this.adapter && this.adapter.setDelay(false);
             },
             end:function () {
-                this.adapter && this.adapter.switch(true);
+                this.adapter && this.adapter.setDelay(true);
                 this.adapter && this.adapter.sort && this.adapter.sort();
                 this.adapter && this.adapter.refresh && this.adapter.refresh();
             },
@@ -269,7 +269,7 @@
                 if(index < 0) return;
                 this.status.splice(index,1);
             },
-            switch:function (flag) {
+            setDelay:function (flag) {
                 this.delay = flag;
             },
             append:function(data){
@@ -565,9 +565,9 @@
                     adapter.popStatus(status);
                 });
             },            
-            switch:function (flag) {
+            setDelay:function (flag) {
                 this.adapters.forEach(function (adapter) {
-                    adapter.switch(flag);
+                    adapter.setDelay(flag);
                 });
             },
             append:function(data){

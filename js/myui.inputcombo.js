@@ -123,32 +123,64 @@
 				}
 				return true;
 			});
-			$('.myui-combo-input',$dom).off('input').on('input',function(){
-				var $this = $(this);
-				var value = $this.val();
-				that.view.resetSelect();
-				if(that.options.url)
-				{
-					that.watcher.search(null);
-					that.reload();
-				}
-				else
-				{
-					that.watcher.search(value);
-					that.adapter.refresh();
-				}
-				if(value.length > 0)
-				{
-					$('.myui-combo-panel',$dom).show();
-					that.view.setSelectable(true);
-				}
-				else
-				{
-					$('.myui-combo-panel',$dom).hide();
-					that.view.setSelectable(false);
-				}
-				return true;
-			});
+			if(!+'\v1')
+			{
+				$('.myui-combo-input',$dom).off('propertychange').on('propertychange',function(){
+					var $this = $(this);
+					var value = $this.val();
+					that.view.resetSelect();
+					if(that.options.url)
+					{
+						that.watcher.search(null);
+						that.reload();
+					}
+					else
+					{
+						that.watcher.search(value);
+						that.adapter.refresh();
+					}
+					if(value.length > 0)
+					{
+						$('.myui-combo-panel',$dom).show();
+						that.view.setSelectable(true);
+					}
+					else
+					{
+						$('.myui-combo-panel',$dom).hide();
+						that.view.setSelectable(false);
+					}
+					return true;
+				});
+			}
+			else
+			{
+				$('.myui-combo-input',$dom).off('input').on('input',function(){
+					var $this = $(this);
+					var value = $this.val();
+					that.view.resetSelect();
+					if(that.options.url)
+					{
+						that.watcher.search(null);
+						that.reload();
+					}
+					else
+					{
+						that.watcher.search(value);
+						that.adapter.refresh();
+					}
+					if(value.length > 0)
+					{
+						$('.myui-combo-panel',$dom).show();
+						that.view.setSelectable(true);
+					}
+					else
+					{
+						$('.myui-combo-panel',$dom).hide();
+						that.view.setSelectable(false);
+					}
+					return true;
+				});
+			}
 			$('.myui-combo-panel',$dom).off('mousedown').on('mousedown',function(event){
 				that.__setkeepshow(true);
 				return true;

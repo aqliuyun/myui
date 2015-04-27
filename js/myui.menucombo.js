@@ -169,7 +169,7 @@
 				if(event.which == 3)
 				{
 					that.close();					
-					that.popup(document.body.scrollLeft + event.clientX,document.body.scrollTop + event.clientY);
+					that.popup(libs.Position.scrollLeft() + event.clientX,libs.Position.scrollTop() + event.clientY);
 				}
 				else
 				{

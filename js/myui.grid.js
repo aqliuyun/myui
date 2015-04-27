@@ -298,26 +298,25 @@ var myui = (function(libs,$){
                 }
                 for (var i = 0; i < count; i++) {
                     var column = options.columns[i];
-                    var width = 0;
                     if(column.width && column.width.toString().indexOf('%') > 0)
                     {
                         var result = parseInt(column.width.toString().substr(0,column.width.length - 1)) / 100 * containerWidth;
                         colWidth += result;
-                        width = result + 'px';
+                        column.rwidth = result;
                     }
                     else if(column.width && column.width.toString().indexOf('px') > 0)
                     {
-                        width = column.width;
-                        colWidth += parseInt(width);
+                        column.rwidth = ~~column.width.substr(0,column.width.length - 2);
+                        colWidth += parseInt(column.rwidth);
                     }
                     else
                     {
                         var result = column.width ? column.width : parseInt((containerWidth - (parseInt(this.options.rowidwidth) || 40)) / count);
-                        width = result + 'px',
+                        column.rwidth = result,
                         colWidth += parseInt(result);
                     }
                     head.push(libs.Utils.strFormat('<th style="width:{0};" class="{4}" data-sortname="{5}">{1}{2}{3}</th>',
-                        width,
+                        column.rwidth + 'px',
                         column.headText,
                         column.sortable ? (this.adapter.getSortField(column.name).enable) ?  (this.adapter.getSortField(column.name).order == 'asc' ? '<span class="sort-caret asc" />': '<span class="sort-caret desc" />'): '<span class="sort-caret asc disabled" />' : '',
                         column.resizable?'<span class="split" data-splitname="' + column.name + '">':'',
@@ -327,13 +326,12 @@ var myui = (function(libs,$){
                     );
                 };
                 
-                head.push('<th class="fix-column" style="' + (this.resizeModel.fixColWidth != null ? 'width:' + this.resizeModel.fixColWidth + 'px':'') + '"></th>');
+                head.push('<th class="fix-column" ' + (this.resizeModel.fixColWidth != null ? 'style="width:' + this.resizeModel.fixColWidth + 'px"':'') + '></th>');
                 
                 head.push('</tr></thead><tbody>');
                 var tableWidth = colWidth;
                 this.resizeModel.tableWidth && (tableWidth = (tableWidth >= this.resizeModel.tableWidth) ? tableWidth : this.resizeModel.tableWidth);
                 tableWidth = tableWidth >= containerWidth ? tableWidth : containerWidth;
-                console.log(colWidth,tableWidth,this.resizeModel.tableWidth);
                 head = ['<div class="col-split"></div><table id="',this.name,this.id,'" class="table myui-table table-resizeable ',options.tableCss?options.tableCss:'','" style="width:'+tableWidth + 'px' ,'"><thead><tr>'].concat(head);
                 return head.join('');
              },
@@ -408,7 +406,14 @@ var myui = (function(libs,$){
 
                 $('th',$dom).click(function(){
                     that.adapter.toggleSortField($(this).attr('data-sortname'),that.options.sortmode == 'single');                        
-                    that.events.onsortchanged && that.events.onsortchanged.apply(that);
+                    if(that.events.onsortchanged){
+                        that.events.onsortchanged.apply(that);
+                    }
+                    else
+                    {
+                        that.adapter.sort();
+                        that.adapter.refresh();
+                    }
                 });
 
                 $('.sel-box', $dom).click(function (event) {
@@ -512,38 +517,35 @@ var myui = (function(libs,$){
                 $dom.mouseup(function(event) {
                     if (!that.resizeModel.resizeing) { return; }
                     $dom.siblings('.col-split').hide();
-                    that.resizeModel.resizeing = false;
+                    that.resizeModel.resizeing = false;                        
                     var $this = $(this); 
                     var x = event.clientX - that.resizeModel.dragoffset;
                     that.resizeModel.dragoffset = event.clientX;                    
-                    var width = that.resizeModel.target.parent().outerWidth();
-                    var containerwidth = $this.parent().outerWidth();
-                    var fixColWidth = $this.find('.fix-column').outerWidth();
-                    var tableWidth = $this.outerWidth();
-                    if(x > 0 && fixColWidth >= x)
-                    {
-                        that.resizeModel.fixColWidth = fixColWidth - x;
-                        that.resizeModel.tableWidth = containerwidth;
-                    }
-                    else if(tableWidth - fixColWidth + x >= containerwidth)
-                    {
-                        that.resizeModel.fixColWidth =  x > 0 && fixColWidth - x > 0 ? fixColWidth - x : 0;
-                        tableWidth = tableWidth + x <= containerwidth ? containerwidth : tableWidth + x;
-                        that.resizeModel.tableWidth = tableWidth;
-                        console.log(tableWidth);
-                    }
-                    else
-                    {
-                        that.resizeModel.fixColWidth = null;
-                        that.resizeModel.tableWidth = containerwidth;
-                    }
-                    var result = width + x;
+                    var colwidth = that.resizeModel.target.parent().outerWidth();
+                    var containerwidth = $this.parent().outerWidth();                    
+                    var result = colwidth + x;
                     var splitname = that.resizeModel.target.attr('data-splitname');
                     var column = libs.Utils.arrayFind(that.options.columns,function(left){
                         return left.name == splitname;
                     });
                     
                     column.width = result + 'px';
+                    column.rwidth = result;
+                    var columns = that.options.columns;
+                    var tableWidth = 0;
+                    for (var i = 0; i < columns.length; i++) {
+                        tableWidth += columns[i].rwidth;
+                    };
+                    if(tableWidth <= containerwidth)
+                    {
+                        that.resizeModel.tableWidth = containerwidth;
+                        that.resizeModel.fixColWidth = null;
+                    }
+                    else
+                    {
+                        that.resizeModel.tableWidth = tableWidth;
+                        that.fixColWidth = 0;
+                    }
                     that.adapter.refresh();
                 })
                 .mouseleave(function(event) {
@@ -553,26 +555,31 @@ var myui = (function(libs,$){
                     var $this = $(this); 
                     var x = event.clientX - that.resizeModel.dragoffset;
                     that.resizeModel.dragoffset = event.clientX;                    
-                    var width = that.resizeModel.target.parent().outerWidth();
-                    var containerwidth = $this.parent().outerWidth();
-                    var fixColWidth = $this.find('.fix-column').outerWidth();
-                    var tableWidth = $this.outerWidth();
-                    if(tableWidth - fixColWidth + x >= containerwidth)
-                    {
-                        tableWidth = tableWidth + x <= containerwidth ? containerwidth : tableWidth + x;
-                        that.resizeModel.tableWidth = tableWidth;
-                    }
-                    else
-                    {
-                        that.resizeModel.tableWidth = containerwidth;
-                    }
-                    var result = width + x;
+                    var colwidth = that.resizeModel.target.parent().outerWidth();
+                    var containerwidth = $this.parent().outerWidth();                    
+                    var result = colwidth + x;
                     var splitname = that.resizeModel.target.attr('data-splitname');
                     var column = libs.Utils.arrayFind(that.options.columns,function(left){
                         return left.name == splitname;
                     });
                     
                     column.width = result + 'px';
+                    column.rwidth = result;
+                    var columns = that.options.columns;
+                    var tableWidth = 0;
+                    for (var i = 0; i < columns.length; i++) {
+                        tableWidth += columns[i].rwidth;
+                    };
+                    if(tableWidth <= containerwidth)
+                    {
+                        that.resizeModel.tableWidth = containerwidth;
+                        that.resizeModel.fixColWidth = null;
+                    }
+                    else
+                    {
+                        that.resizeModel.tableWidth = tableWidth;
+                        that.fixColWidth = 0;
+                    }
                     that.adapter.refresh();
                 })
                 .mousemove(function(event) {
@@ -596,11 +603,7 @@ var myui = (function(libs,$){
                 this.events.onunbindevents && this.events.onunbindevents.apply(this);
             },
             events: {
-                onsortchanged:function(){
-                    var that = this;
-                    that.adapter.sort();
-                    that.adapter.refresh();
-                },
+                onsortchanged:null,
                 onbindevents:null,
                 onunbindevents:null,
                 onselectdata:null

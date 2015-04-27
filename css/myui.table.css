@@ -20,6 +20,9 @@
 	position: relative;    
 	text-align:center;	
 	overflow: hidden;
+	box-sizing:border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
 }
 .myui-table th.sortable{
 	cursor: pointer;
@@ -40,6 +43,7 @@
 	padding: 0!important;
 	margin: 0!important;
 	white-space:nowrap;
+	display: table-cell;
 	font-size: 1px!important;
 }
 
