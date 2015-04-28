@@ -7,7 +7,7 @@
 	border: 1px solid #333;
 }
 
-.myui-table
+.myui-grid
 {
 	max-width: inherit;
 	margin-bottom: 0px;
@@ -15,7 +15,7 @@
 	table-layout: fixed;
 }
 
-.myui-table th
+.myui-grid th
 {
 	position: relative;    
 	text-align:center;	
@@ -24,10 +24,23 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 }
-.myui-table th.sortable{
+
+.myui-grid th,.myui-grid td
+{
+	padding: 6px;
+	overflow: hidden;
+}
+
+.myui-grid th
+{
+	padding: 6px 0;
+	overflow: hidden;
+}
+
+.myui-grid th.sortable{
 	cursor: pointer;
 }
-.myui-table th .split
+.myui-grid th .split
 {
 	cursor: col-resize;
 	display: inline-block;
@@ -38,7 +51,7 @@
 	height: 100%;            
 }
 
-.myui-table th.fix-column
+.myui-grid th.fix-column
 {
 	padding: 0!important;
 	margin: 0!important;
@@ -47,49 +60,49 @@
 	font-size: 1px!important;
 }
 
-.myui-table th:hover .split
+.myui-grid th:hover .split
 {
 	border-right:1px solid #333;
 }
 
-.myui-table th .split:hover
+.myui-grid th .split:hover
 {
 	border-right:1px solid #333;
 }
 
-.myui-table .sort-caret {
+.myui-grid .sort-caret {
 	width:0;
 	height:0;
 	margin-left:2px;
 }
-.myui-table .sort-caret.disabled
+.myui-grid .sort-caret.disabled
 {
 	color:#ddd;
 }
-.myui-table .sort-caret.desc:after
+.myui-grid .sort-caret.desc:after
 {
 	content:'\25BC';            
 }
 
-.myui-table .sort-caret.asc:after {
+.myui-grid .sort-caret.asc:after {
 	content: '\25B2';
 }
 
-.myui-table .sel-box.radio
+.myui-grid .sel-box.radio
 {
 	appearance:radio;
 	-webkit-appearance:radio;
 	-ms-appearance:radio;
 }
 
-.myui-table .sel-box.checkbox
+.myui-grid .sel-box.checkbox
 {
 	appearance:checkbox;
 	-webkit-appearance:checkbox;
 	-ms-appearance:checkbox;
 }
 
-.myui-table .rowid,.rowindex
+.myui-grid .rowid,.rowindex
 {
 	padding-left: 0px!important;
 	padding-right: 0px!important;

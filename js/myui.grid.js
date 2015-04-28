@@ -72,7 +72,11 @@ var myui = (function(libs,$){
                     var top = $('.scroller-container', $dom).scrollTop();
                     $('.scroller-container', $dom).scrollTop(top + event.originalEvent.deltaY);
                     event.preventDefault();
-                });
+                    event.stopPropagation();
+                });                
+                $dom.on('mousedrag',function(event){
+                    event.preventDefault();
+                })
             },
             unBindEvents:function () {
                 var $dom = $('#watcher_'+this.id);
@@ -332,7 +336,7 @@ var myui = (function(libs,$){
                 var tableWidth = colWidth;
                 this.resizeModel.tableWidth && (tableWidth = (tableWidth >= this.resizeModel.tableWidth) ? tableWidth : this.resizeModel.tableWidth);
                 tableWidth = tableWidth >= containerWidth ? tableWidth : containerWidth;
-                head = ['<div class="col-split"></div><table id="',this.name,this.id,'" class="table myui-table table-resizeable ',options.tableCss?options.tableCss:'','" style="width:'+tableWidth + 'px' ,'"><thead><tr>'].concat(head);
+                head = ['<div class="grid-container" style="overflow:hidden;width:',tableWidth,'px;height:100%;"><div class="col-split"></div><table id="',this.name,this.id,'" class="grid myui-grid grid-resizeable ',options.tableCss?options.tableCss:'','" style="width:'+tableWidth + 'px' ,'"><thead><tr>'].concat(head);
                 return head.join('');
              },
             //渲染主题部分
@@ -369,7 +373,7 @@ var myui = (function(libs,$){
                     var colspan = (this.options.columns.length + (this.options.rowid ? 2 : 1)) ;
                     return ['</tbody>','<tfoot><tr><td colspan="' + colspan + '">',libs.Utils.strFormat(this.options.footText || '总共{0}条数据',this.adapter.manager.count()),'</td></tr></tfoot>','</table>'].join('');
                 }
-                return ['</tbody>','</table>'].join('');
+                return ['</tbody>','</table></div>'].join('');
             },
             //渲染空
             renderEmpty:function(){
@@ -513,22 +517,21 @@ var myui = (function(libs,$){
                     that.resizeModel.resizeing = true;
                     that.resizeModel.dragoffset = event.clientX;
                     that.resizeModel.target = $(this);
-                });                             
-                $dom.mouseup(function(event) {
-                    if (!that.resizeModel.resizeing) { return; }
+                });    
+                var __calcWidth = function (event){
                     $dom.siblings('.col-split').hide();
                     that.resizeModel.resizeing = false;                        
                     var $this = $(this); 
                     var x = event.clientX - that.resizeModel.dragoffset;
                     that.resizeModel.dragoffset = event.clientX;                    
                     var colwidth = that.resizeModel.target.parent().outerWidth();
-                    var containerwidth = $this.parent().outerWidth();                    
+                    var containerwidth = that.adapter.container.outerWidth();                    
                     var result = colwidth + x;
                     var splitname = that.resizeModel.target.attr('data-splitname');
                     var column = libs.Utils.arrayFind(that.options.columns,function(left){
                         return left.name == splitname;
                     });
-                    
+                    result = result <= 2 ? 2 :result;
                     column.width = result + 'px';
                     column.rwidth = result;
                     var columns = that.options.columns;
@@ -547,40 +550,14 @@ var myui = (function(libs,$){
                         that.fixColWidth = 0;
                     }
                     that.adapter.refresh();
+                };
+                $dom.mouseup(function(event) {
+                    if (!that.resizeModel.resizeing) { return; }
+                    __calcWidth(event);
                 })
                 .mouseleave(function(event) {
                     if (!that.resizeModel.resizeing) { return; }
-                    $dom.siblings('.col-split').hide();
-                    that.resizeModel.resizeing = false;                        
-                    var $this = $(this); 
-                    var x = event.clientX - that.resizeModel.dragoffset;
-                    that.resizeModel.dragoffset = event.clientX;                    
-                    var colwidth = that.resizeModel.target.parent().outerWidth();
-                    var containerwidth = $this.parent().outerWidth();                    
-                    var result = colwidth + x;
-                    var splitname = that.resizeModel.target.attr('data-splitname');
-                    var column = libs.Utils.arrayFind(that.options.columns,function(left){
-                        return left.name == splitname;
-                    });
-                    
-                    column.width = result + 'px';
-                    column.rwidth = result;
-                    var columns = that.options.columns;
-                    var tableWidth = 0;
-                    for (var i = 0; i < columns.length; i++) {
-                        tableWidth += columns[i].rwidth;
-                    };
-                    if(tableWidth <= containerwidth)
-                    {
-                        that.resizeModel.tableWidth = containerwidth;
-                        that.resizeModel.fixColWidth = null;
-                    }
-                    else
-                    {
-                        that.resizeModel.tableWidth = tableWidth;
-                        that.fixColWidth = 0;
-                    }
-                    that.adapter.refresh();
+                    __calcWidth(event);
                 })
                 .mousemove(function(event) {
                     var $this = $(this);                        
@@ -588,10 +565,10 @@ var myui = (function(libs,$){
                     $dom.parent().css('position','relative');
                     var $split =$dom.siblings('.col-split');
                     $split.height($('th',$dom).outerHeight());
-                    $split.css('left',event.clientX - that.adapter.container.offset().left + $split.parent().scrollLeft()).show();
+                    $split.css('left',event.clientX - that.adapter.container.parent().offset().left + that.adapter.container.scrollLeft()).show();
                 });   
                 this.events.onbindevents && this.events.onbindevents.apply(this);                
-            },
+            },            
             unBindEvents:function(){
                 var that = this;
                 var $dom = $('#'+that.name + that.id);
