@@ -28,7 +28,7 @@
 		getSubMenuOffset:function(key){
 			var $container = this.dom();			
 			var $obj = $('.myui-menu-item[data-modelKey='+key + ']',$container);
-			var offset =  libs.Position.getOffsetPosition($obj.get(0));
+			var offset =  libs.Measurement.getOffset($obj.get(0));
 			console.log(offset);
 			offset.left += $obj.outerWidth() + 3;
 			return offset;
@@ -169,7 +169,7 @@
 				if(event.which == 3)
 				{
 					that.close();					
-					that.popup(libs.Position.scrollLeft() + event.clientX,libs.Position.scrollTop() + event.clientY);
+					that.popup(libs.Measurement.scrollLeft() + event.clientX,libs.Measurement.scrollTop() + event.clientY);
 				}
 				else
 				{

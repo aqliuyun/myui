@@ -74,9 +74,6 @@ var myui = (function(libs,$){
                     event.preventDefault();
                     event.stopPropagation();
                 });                
-                $dom.on('mousedrag',function(event){
-                    event.preventDefault();
-                })
             },
             unBindEvents:function () {
                 var $dom = $('#watcher_'+this.id);

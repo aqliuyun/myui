@@ -388,8 +388,8 @@ var myui = (function(){
 
     //坐标计算类
     (function(){
-        libs.Position = {
-            getOffsetPosition:function(element){
+        libs.Measurement = {
+            getOffset:function(element){
                 var left = 0;
                 var top = 0;
                 var obj = element;
@@ -406,6 +406,52 @@ var myui = (function(){
             },
             scrollLeft:function(){
                 return document.documentElement.scrollLeft || window.pageXOffset || document.body.scrollLeft;
+            },   
+            //width+padding
+            clientWidth:function(element){
+                if(element == undefined)
+                {
+                    return document.documentElement.clientWidth || document.body.offsetWidth;
+                }
+                return element.clientWidth;
+            },
+            //height+padding
+            clientHeight:function(element){
+                if(element == undefined)
+                {
+                    return document.documentElement.clientHeight || document.body.offsetHeight;
+                }
+                return element.clientHeight;
+            },
+            //width+padding+border
+            offsetWidth:function(element){
+                if(element == undefined)
+                {
+                    return document.documentElement.offsetWidth || document.body.offsetWidth;
+                }
+                return element.offsetWidth;
+            },
+            //height+padding+border
+            offsetHeight:function(element){
+                if(element == undefined)
+                {
+                    return document.documentElement.offsetHeight || document.body.offsetHeight;
+                }
+                return element.offsetHeight;
+            },
+            scrollWidth:function(element){
+                if(element == undefined)
+                {
+                    return document.documentElement.scrollWidth || document.body.scrollWidth;
+                }
+                return element.scrollWidth;
+            },
+            scrollHeight:function(element){
+                if(element == undefined)
+                {
+                    return document.documentElement.scrollHeight || document.body.scrollHeight;
+                }
+                return element.scrollHeight;
             }
         }        
     })();

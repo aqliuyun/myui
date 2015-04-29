@@ -1,0 +1,62 @@
+.myui-scrollbar
+{
+	position: absolute;
+	width: 4px;
+	height: 4px;
+	background-color:rgba(0,0,0,0.1);
+}
+
+.myui-scrollbar-slider
+{
+	background-color: #666;
+}
+
+.myui-scrollbar-slider:hover,
+.myui-scrollbar-slider.dragging
+{
+	background-color: #333;
+}
+
+.myui-scrollbar-x
+{
+	bottom:0px;
+	left:0px;
+}
+
+.myui-scrollbar-y
+{
+	top:0px;
+	right:0px;
+}
+
+.myui-scrollbar-x .myui-scrollbar-slider
+{
+	border-radius: 5px;
+	width: 10%;
+	height: 4px;
+	bottom:0px;
+	left:0px;
+}
+
+.myui-scrollbar-x .myui-scrollbar-slider:hover,
+.myui-scrollbar-x .myui-scrollbar-slider.dragging
+{
+	height:4px;
+	-webkit-transition:height 0.3s ease;
+}
+
+.myui-scrollbar-y .myui-scrollbar-slider
+{
+	border-radius: 5px;
+	height: 10%;
+	width: 4px;
+	top:0px;
+	right:0px;
+}
+
+.myui-scrollbar-y .myui-scrollbar-slider:hover,
+.myui-scrollbar-y .myui-scrollbar-slider.dragging
+{
+	width:4px;
+	-webkit-transition:width 0.3s ease;
+}
