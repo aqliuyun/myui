@@ -19,7 +19,8 @@ module.exports = function (grunt) {
         'js/myui.inputcombo.js',
         'js/myui.menucombo.js',
         'js/myui.selectcombo.js',
-        'js/myui.scrollbar.js'
+        'js/myui.scrollbar.js',
+        'js/myui.tree.js',
         ],
         dest: 'dist/myui.js'
       }
