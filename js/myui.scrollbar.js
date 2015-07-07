@@ -11,7 +11,7 @@
 			this.ySliderSize = 0;
 			this.scrollStep = options.scrollStep || 10;
 			this.container = $(options.container || 'html,body');
-			if(this.container)
+			if(this.container.length > 0)
 			{
 				this.attach(this.container);
 			}
