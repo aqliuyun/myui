@@ -22,7 +22,12 @@
 {
 
 }
-.tree-parent-item>.icon{
+.head-text.highlight
+{
+	background-color: #ddd;
+}
+.tree-parent-item>.icon,
+.tree-asyncload-item>.icon{
 	cursor: pointer;
 }
 .tree-item .icon
@@ -41,6 +46,7 @@
 .tree-item .head-text
 {
 	display: block;
+	cursor: pointer;
 }
 
 .tree-item .description

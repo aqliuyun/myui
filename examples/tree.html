@@ -16,7 +16,9 @@
     </style>
 </head>
 <body>
-	<div class="myui-tree" style="width:200px;margin-top:20px;margin-left:200px;border:1px dashed #ddd;">
+	<div class="myui-tree1" style="width:200px;margin-top:20px;margin-left:200px;border:1px dashed #ddd;">
+	</div>
+	<div class="myui-tree2" style="width:200px;margin-top:20px;margin-left:200px;border:1px dashed #ddd;">
 	</div>
 	<script type="text/javascript">
 		var datas = [
@@ -30,16 +32,51 @@
 			{id:8,text:'item 8',parent: 6,icon:'glyphicon glyphicon-user'},
 			{id:9,text:'item 9',icon:'glyphicon glyphicon-home'},
 			{id:10,text:'item 10',icon:'glyphicon glyphicon-home'},
+			{id:11,text:'item 11',icon:'glyphicon glyphicon-user',parent:10},
+			{id:12,text:'item 12',icon:'glyphicon glyphicon-user',parent:10},
+			{id:13,text:'item 13',icon:'glyphicon glyphicon-user',parent:10},
+			{id:14,text:'item 14',icon:'glyphicon glyphicon-user',parent:10},
+			{id:15,text:'item 15',icon:'glyphicon glyphicon-home',parent:10,asyncload:true},
 		];
-		var tree = new myui.Widgets.Tree({
+		var tree1 = new myui.Widgets.Tree({
 			modelKey:'id',
 			modelText:'text',
 			modelParent:'parent',
 			modelIcon:'icon',
 			dataparser:'list',
-			datas:datas
+			datas:datas,
+			selectmode:'single',
+			events:{
+				onselect:function (modelKey) {
+					console.log('i am select ',modelKey);
+				},
+				ontreecomplete:function(){
+					console.log('tree complete');
+				},
+				onasyncload:function(parentKey,callback){
+					callback({
+						dataparser:'list',
+						datas:[
+							{id:16,text:'item 16',icon:'glyphicon glyphicon-user',parent:15},
+							{id:17,text:'item 17',icon:'glyphicon glyphicon-user',parent:15},
+							{id:18,text:'item 18',icon:'glyphicon glyphicon-user',parent:15},
+							{id:19,text:'item 19',icon:'glyphicon glyphicon-user',parent:15},
+						]
+					})
+				}
+			}
 		});
-		tree.attach($('.myui-tree'));
+		tree1.attach($('.myui-tree1'));
+		var tree2 = new myui.Widgets.Tree({
+			modelKey:'id',
+			modelText:'text',
+			modelParent:'parent',
+			modelIcon:'icon',
+			dataparser:'list',
+			datas:datas,
+			selectmode:'multi'
+		});
+		tree2.attach($('.myui-tree2'));
 	</script>
 </body>
 </html>
