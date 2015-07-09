@@ -1,0 +1,19 @@
+.myui-tab-head
+{
+	float: left;
+	border:1px dashed #ddd;
+	border-left:0px;
+	min-width: 100px;
+	text-align: center;
+	cursor: pointer;
+}
+
+.myui-tab-head.active
+{
+	background-color: #ddd;
+}
+
+.myui-tab-head:first-child
+{
+	border-left: 1px dashed #ddd;
+}
