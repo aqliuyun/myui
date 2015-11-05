@@ -27,6 +27,51 @@
 			this.container = null;			
 			this.unBindEvents();
 		},
+		resize:function(){
+			var that = this;
+			var $dom = this.dom();
+			$dom.remove();
+			that.unBindEvents();	
+			that.__build();
+			that.reposition();
+			that.bindEvents();			
+		},
+		reposition:function(){
+			var that = this;
+			var $dom = that.dom();
+			var isroot = that.container.is('html,body');
+			var width = libs.Measurement.clientWidth(isroot?null:that.container.get(0));
+			var height = libs.Measurement.clientHeight(isroot?null:that.container.get(0));
+			var contentWidth = libs.Measurement.scrollWidth(isroot?null:that.container.get(0));
+			var contentHeight = libs.Measurement.scrollHeight(isroot?null:that.container.get(0));
+			var mode = that.options.mode;
+			if(mode == 'horizontal' || mode != 'vertical')
+			{
+				var $slider = $('.myui-scrollbar-slider-x',$dom);
+				if($slider.length > 0){
+					var maxscroll = width - that.xSliderSize;
+					if(maxscroll <= 0) return false;
+					var result = this.container.scrollLeft();
+					result = result <= 0 ? 0:result;
+					result = result >= maxscroll ? maxscroll:result;
+					result = result * maxscroll / (contentWidth - width);
+					$slider.css('marginLeft',result);
+				}					
+			}				
+			if(mode == 'vertical' || mode != 'horizontal')
+			{
+				var $slider = $('.myui-scrollbar-slider-y',$dom);
+				if($slider.length > 0){
+					var maxscroll = height - that.ySliderSize;
+					if(maxscroll <= 0) return false;
+					var result = this.container.scrollTop();
+					result = result <= 0 ? 0:result;
+					result = result >= maxscroll ? maxscroll:result;	
+					result = result * maxscroll / (contentHeight - height);
+					$slider.css('marginTop',result);
+				}
+			}
+		},
 		dom:function(){
 			if(this.options.mode == 'horizontal')
 			{
@@ -85,7 +130,7 @@
 					style = ["left:",offset.left,'px;',"top:",offset.top + height - that.xSliderWidth,'px;',"width:",width,'px;',showX ? 'display:block;':'display:none;'].join('');
 				}
 				codes.push(libs.Utils.strFormat('<div id="myui_scrollbar_x_{0}" class="myui-scrollbar myui-scrollbar-{0} myui-scrollbar-x {1}" style="{2}">',this.id,options.scrollbarCss || '',style));
-				codes.push(libs.Utils.strFormat('<div class="myui-scrollbar-slider myui-scrollbar-slider-x {0}" style="width:{1}px"></div></div>',options.sliderCss || '',that.xSliderSize));
+				codes.push(libs.Utils.strFormat('<div class="myui-scrollbar-slider myui-scrollbar-slider-x {0}" style="width:{1}px;"></div></div>',options.sliderCss || '',that.xSliderSize));
 			}
 			//纵向
 			if(mode == 'vertical' || mode != 'horizontal')
@@ -111,7 +156,7 @@
 					style = ['left:',offset.left + width - that.ySliderWidth,'px;','top:',offset.top,'px;','height:',height,'px;',showY ? 'display:block;':'display:none;'].join('');
 				}				
 				codes.push(libs.Utils.strFormat('<div id="myui_scrollbar_y_{0}" class="myui-scrollbar myui-scrollbar-{0} myui-scrollbar-y {1}" style="{2}">',this.id,options.scrollbarCss || '',style));
-				codes.push(libs.Utils.strFormat('<div class="myui-scrollbar-slider myui-scrollbar-slider-y {0}" style="height:{1}px"></div></div>',options.sliderCss || '',that.ySliderSize));
+				codes.push(libs.Utils.strFormat('<div class="myui-scrollbar-slider myui-scrollbar-slider-y {0}" style="height:{1}px;"></div></div>',options.sliderCss || '',that.ySliderSize));
 			}
 			$(document.body).append(codes.join(''));			
 		},
@@ -137,7 +182,7 @@
 					$(document.documentElement).scrollTop(contenttop);
 				}
 				else
-				{				
+				{
 					that.container.scrollTop(contenttop);
 				}
 				$slider.css('marginTop',result);
@@ -217,6 +262,9 @@
 					var $this = $('.myui-scrollbar-slider',$dom);
 					$this.removeClass('dragging');
 				}, 10);
+			});
+			$(window).off('resize.myui.scrollbar').on('resize.myui.scrollbar',function(){
+				that.resize();
 			});
 		},
 		unBindEvents:function(){
