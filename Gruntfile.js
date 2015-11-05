@@ -22,6 +22,7 @@ module.exports = function (grunt) {
         'js/myui.scrollbar.js',
         'js/myui.tree.js',
         'js/myui.tab.js',
+        'js/myui.scrollload.js'
         ],
         dest: 'dist/myui.js'
       }

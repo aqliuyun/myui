@@ -540,5 +540,9 @@ var myui = (function(){
         }
         return Scroller;
     })();    
+
+    //日志
+    libs.log = function(){if(!libs.debug) return;console.log(arguments);} ;
+
     return libs;
 })();

@@ -4,7 +4,7 @@
 			if(options == null || arguments.length == 0) return;
 			this.id = libs.Utils.unique();
 			this.options = options;
-			this.dragModel = {}
+			this.dragModel = {};
 			this.xSliderWidth = 4;
 			this.ySliderWidth = 4;
 			this.xSliderSize = 0;
