@@ -103,7 +103,9 @@
             },
             { headText:'key',name:'key',resizable:true,sortable:true,sorttype:'number',sortlevel:3,sortenable:true,width:'20%'},
             { headText:'value',name:'value',resizable:true,width:'80%',sortable:true,sortlevel:1,sortenable:false,},
-            { headText:'tag',name:'tag',resizable:true,width:'200px'}
+            { headText:'tag',name:'tag',resizable:true,width:'200px',format:function(value,data,view){
+				return '<a>'+data.tag+'</a>'
+			}}
         ]
     });
 

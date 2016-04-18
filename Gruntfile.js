@@ -3,7 +3,7 @@ module.exports = function (grunt) {
   {
     concat: {//文件合并  
       css: {
-        src: ['css/*.css','!css/myui.checkbox.css'],
+        src: ['css/framework.css','css/*.css','!css/myui.checkbox.css'],
         dest: 'dist/myui.css'
       },
       js:{
@@ -22,7 +22,8 @@ module.exports = function (grunt) {
         'js/myui.scrollbar.js',
         'js/myui.tree.js',
         'js/myui.tab.js',
-        'js/myui.scrollload.js'
+        'js/myui.scrollload.js',
+        'js/myui.layout.js',
         ],
         dest: 'dist/myui.js'
       }

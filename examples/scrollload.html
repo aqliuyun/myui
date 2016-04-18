@@ -23,7 +23,7 @@
     </style>
 </head>
 <body class="myui" onselectstart="return false;">
-    <div class="list-group dragging">
+    <div class="list-group dragging" style="height:calc(100%);overflow:auto;">
       <li class="list-group-item">Cras justo odio</li>
       <li class="list-group-item">Dapibus ac facilisis in</li>
       <li class="list-group-item">Morbi leo risus</li>
@@ -32,7 +32,7 @@
     </div>
     <script type="text/javascript">
         $.ajax = function(options){
-            options.success(['a','b','c']);
+            options.success([Math.random().toString().substring(2,5),Math.random().toString().substring(2,5),Math.random().toString().substring(2,5)]);
         }
         myui.debug = true;
          var s1 = new myui.Widgets.ScrollLoad({

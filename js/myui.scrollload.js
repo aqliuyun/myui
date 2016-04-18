@@ -33,12 +33,14 @@
 			// });
 			that.container.off('mousedown.myui.scrollload.'+that.id).on('mousedown.myui.scrollload.'+that.id,function(event){
 				clearTimeout(that.dragtimer);				
-				that.dragModel.scrolling = true;
-				that.dragModel.target = $(this);
-				that.dragModel.begin = { "x":event.clientX,"y":event.clientY };
-				$(this).addClass('dragging');
-				libs.log('myui.scrolload.dragging begin');				
-				return false;
+				if(that.container.scrollTop() == 0 || (that.container.scrollTop() + that.container.height() == that.container.get(0).scrollHeight))
+				{
+					that.dragModel.scrolling = true;
+					that.dragModel.target = $(this);
+					that.dragModel.begin = { "x":event.clientX,"y":event.clientY };
+					$(this).addClass('dragging');
+					libs.log('myui.scrolload.dragging begin');				
+				}
 			});
 			$(document).off('mousemove.myui.scrollload.'+that.id).on('mousemove.myui.scrollload.'+that.id,function(event){
 				if(!that.dragModel.scrolling) return;
@@ -46,15 +48,16 @@
 				var length = event.clientY - that.dragModel.begin.y;								
 				if(that.options.dragHeight >= Math.abs(length))
 				{
-					if(length > 0)
+					if(length > 0 && that.container.scrollTop() == 0)
 					{
 						that.container.addClass('dragging-down');
+						that.container.css('-webkit-transform','translateY('+length+'px)');	
 					}
-					else
+					else if(length < 0 && (that.container.scrollTop() + that.container.height() == that.container.get(0).scrollHeight))
 					{
 						that.container.addClass('dragging-up');
+						that.container.css('-webkit-transform','translateY('+length+'px)');	
 					}
-					that.container.css('-webkit-transform','translateY('+length+'px)');					
 				}
 			});
 			$(document).off('mouseup.myui.scrollload.'+that.id).on('mouseup.myui.scrollload.'+that.id,function(event){
@@ -70,9 +73,9 @@
 					if(that.options.dragHeight <= Math.abs(length))
 					{
 						libs.log('myui.scrolload.dragging trigger load');
-						if(length > 0)
+						if(length > 0 && that.container.scrollTop() == 0)
 							that.__prevload();
-						else
+						else if(length < 0 && (that.container.scrollTop() + that.container.height() == that.container.get(0).scrollHeight))
 							that.__nextload();
 					}
 				}, 10);
@@ -80,8 +83,8 @@
 		},
 		unBindEvents:function(){
 			var that = this;
-			that.container.off('mousewheel.myui.scrollload');
-			that.container.off('mousedown.myui.scrollload');
+			that.container.off('mousewheel.myui.scrollload.' + that.id);
+			that.container.off('mousedown.myui.scrollload.' + that.id);
 			$(document).off('mousemove.myui.scrollload.' + that.id);
 			$(document).off('mouseup.myui.scrollload.' + that.id);
 		},
